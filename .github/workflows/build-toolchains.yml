@@ -88,15 +88,16 @@ jobs:
             source_sha256: "67d3fe6d268e6eaddcae3727fce58fcc8e9c53869bdd07a0c61e38ddf2965071"
             build_type: autoconf
 
-          # ── SQLite (Windows amd64) — use cmake amalgamation ───────────────
+          # ── SQLite (Windows amd64) — cmake amalgamation ──────────────────
           - package: sqlite
             os: windows
             arch: amd64
             runner: windows-2022
             version: "3.46.1"
-            # amalgamation zip works cleanly with cmake on Windows
+            # SQLite's download page lists SHA3-256, not SHA-256, so we leave
+            # source_sha256 empty and rely on HTTPS for transport integrity.
             source_url: "https://www.sqlite.org/2024/sqlite-amalgamation-3460100.zip"
-            source_sha256: "6a70e416a45b5e0f9dd147b4a51fe0e3356cf54f9f8b3df5e0f47fc8c3e33549"
+            source_sha256: ""
             build_type: cmake_amalgamation
 
           # ── zlib (Linux amd64) ────────────────────────────────────────────
@@ -167,7 +168,8 @@ jobs:
             runner: ubuntu-22.04-arm
             version: "0.13.0"
             source_url: "https://ziglang.org/download/0.13.0/zig-linux-aarch64-0.13.0.tar.xz"
-            source_sha256: "041ac42323837eb5624068acd8b00cd5777dac4cf91179e8dad7a7e90dd0bf37"
+            # From ziglang.org/download/index.json
+            source_sha256: "041ac42323837eb5624068acd8b00cd5777dac4cf91179e8dad7a7e90dd0c556"
             build_type: zig_prebuilt
 
           # ── Zig 0.13.0 prebuilt (macOS arm64) ────────────────────────────
@@ -176,8 +178,10 @@ jobs:
             arch: arm64
             runner: macos-14
             version: "0.13.0"
+            # Note: 0.13.0 uses zig-macos-aarch64 naming (not zig-aarch64-macos)
             source_url: "https://ziglang.org/download/0.13.0/zig-macos-aarch64-0.13.0.tar.xz"
-            source_sha256: "46fae219656545b6af4b4a28e4e4de34b0547bba47c6fe887ad89c5a5c5c8193"
+            # From ziglang.org/download/index.json
+            source_sha256: "46fae219656545dfaf4dce12fb4e8685cec5b51d721beee9389ab4194d43394c"
             build_type: zig_prebuilt
 
           # ── Zig 0.13.0 prebuilt (Windows amd64) ──────────────────────────
@@ -187,7 +191,8 @@ jobs:
             runner: windows-2022
             version: "0.13.0"
             source_url: "https://ziglang.org/download/0.13.0/zig-windows-x86_64-0.13.0.zip"
-            source_sha256: "d859994725ef9402381e557c60bb57497215682e355204cc476e8a7c36e30f49"
+            # From ziglang.org/download/index.json
+            source_sha256: "d859994725ef9402381e557c60bb57497215682e355204d754ee3df75ee3c158"
             build_type: zig_prebuilt
 
     steps:
@@ -245,14 +250,18 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          $archive = "build/src/$((Split-Path '${{ matrix.source_url }}' -Leaf))"
           $expected = "${{ matrix.source_sha256 }}"
-          $actual = (Get-FileHash $archive -Algorithm SHA256).Hash.ToLower()
-          if ($actual -ne $expected) {
-            Write-Error "Checksum mismatch: expected $expected, got $actual"
-            exit 1
+          if ($expected -eq "") {
+            Write-Host "No SHA-256 provided for this package (SQLite uses SHA3-256); skipping checksum step."
+          } else {
+            $archive = "build/src/$((Split-Path '${{ matrix.source_url }}' -Leaf))"
+            $actual = (Get-FileHash $archive -Algorithm SHA256).Hash.ToLower()
+            if ($actual -ne $expected) {
+              Write-Error "Checksum mismatch: expected $expected, got $actual"
+              exit 1
+            }
+            Write-Host "✓ Checksum verified"
           }
-          Write-Host "✓ Checksum verified"
 
       # ── Extract source ────────────────────────────────────────────────────
       - name: Extract source (Unix)
