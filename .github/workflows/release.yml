@@ -1,11 +1,13 @@
 name: Release Kompa CLI
 
-# Triggered on every push to main — creates a sequential vN tag and publishes
+# Triggered on every push to master — creates a sequential vN tag and publishes
 # pre-built Kompa CLI binaries for all supported platforms.
+# Can also be triggered manually via workflow_dispatch.
 on:
   push:
     branches:
-      - main
+      - master
+  workflow_dispatch:
 
 permissions:
   contents: write
