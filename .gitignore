@@ -1,10 +1,12 @@
-# Build outputs
-kompa
-kompa.exe
+# Build outputs — only the compiled binary at the repo root
+/kompa
+/kompa.exe
 dist/
+
+# Windows executables anywhere
 *.exe
 
-# Test cache
+# Test artifacts
 *.test
 *.out
 
