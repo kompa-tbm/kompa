@@ -8,50 +8,37 @@ on:
         required: false
         default: "all"
   schedule:
-    # Build toolchains weekly on Sunday at 02:00 UTC to pick up upstream patches.
+    # Rebuild toolchains weekly on Sunday at 02:00 UTC.
     - cron: "0 2 * * 0"
 
 permissions:
   contents: write
 
-# ---------------------------------------------------------------------------
-# Each job builds one package for one platform from upstream source.
-# The matrix is the authoritative record of what Kompa distributes.
-# ---------------------------------------------------------------------------
 jobs:
-  # -------------------------------------------------------------------------
-  # Determine the next sequential release tag (v1, v2, v3 …)
-  # -------------------------------------------------------------------------
+  # ── Determine next sequential release tag ─────────────────────────────────
   next-tag:
     name: Determine next release tag
     runs-on: ubuntu-latest
     outputs:
       tag: ${{ steps.tag.outputs.tag }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Compute next tag
+      - name: Compute next vN tag
         id: tag
         run: |
-          # List all vN tags, find the highest N, output v(N+1).
           MAX=0
-          while IFS= read -r tag; do
-            N="${tag#v}"
-            if [[ "$N" =~ ^[0-9]+$ ]] && (( N > MAX )); then
-              MAX=$N
-            fi
+          while IFS= read -r t; do
+            N="${t#v}"
+            if [[ "$N" =~ ^[0-9]+$ ]] && (( N > MAX )); then MAX=$N; fi
           done < <(git tag --list 'v[0-9]*')
           NEXT=$((MAX + 1))
           echo "tag=v${NEXT}" >> "$GITHUB_OUTPUT"
           echo "Next release tag: v${NEXT}"
 
-  # -------------------------------------------------------------------------
-  # Build each package for each supported OS/arch.
-  # Only platforms listed as supported in the package registry are attempted.
-  # -------------------------------------------------------------------------
+  # ── Build matrix ───────────────────────────────────────────────────────────
   build:
     name: ${{ matrix.package }} (${{ matrix.os }}/${{ matrix.arch }})
     needs: next-tag
@@ -60,39 +47,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # ── GCC ───────────────────────────────────────────────────────────
-          - package: gcc
-            os: linux
-            arch: amd64
-            runner: ubuntu-22.04
-            version: "14.2.0"
-            source_url: "https://ftp.gnu.org/gnu/gcc/gcc-14.2.0/gcc-14.2.0.tar.xz"
-            source_sha256: "a7b39bc69cbf9e25826c5a60ab26477001f7c08d85cec04bc0e29cabed6f3cc9"
-          - package: gcc
-            os: linux
-            arch: arm64
-            runner: ubuntu-22.04-arm
-            version: "14.2.0"
-            source_url: "https://ftp.gnu.org/gnu/gcc/gcc-14.2.0/gcc-14.2.0.tar.xz"
-            source_sha256: "a7b39bc69cbf9e25826c5a60ab26477001f7c08d85cec04bc0e29cabed6f3cc9"
 
-          # ── Binutils ──────────────────────────────────────────────────────
-          - package: binutils
-            os: linux
-            arch: amd64
-            runner: ubuntu-22.04
-            version: "2.42"
-            source_url: "https://ftp.gnu.org/gnu/binutils/binutils-2.42.tar.xz"
-            source_sha256: "f6e4d41fd5fc778b06b7891457b3620da5ecea1006c6a4a41ae998109f85a800"
-          - package: binutils
-            os: linux
-            arch: arm64
-            runner: ubuntu-22.04-arm
-            version: "2.42"
-            source_url: "https://ftp.gnu.org/gnu/binutils/binutils-2.42.tar.xz"
-            source_sha256: "f6e4d41fd5fc778b06b7891457b3620da5ecea1006c6a4a41ae998109f85a800"
-
-          # ── SQLite ────────────────────────────────────────────────────────
+          # ── SQLite (Linux amd64) ───────────────────────────────────────────
           - package: sqlite
             os: linux
             arch: amd64
@@ -100,6 +56,9 @@ jobs:
             version: "3.46.1"
             source_url: "https://www.sqlite.org/2024/sqlite-autoconf-3460100.tar.gz"
             source_sha256: "67d3fe6d268e6eaddcae3727fce58fcc8e9c53869bdd07a0c61e38ddf2965071"
+            build_type: autoconf
+
+          # ── SQLite (Linux arm64) ───────────────────────────────────────────
           - package: sqlite
             os: linux
             arch: arm64
@@ -107,6 +66,9 @@ jobs:
             version: "3.46.1"
             source_url: "https://www.sqlite.org/2024/sqlite-autoconf-3460100.tar.gz"
             source_sha256: "67d3fe6d268e6eaddcae3727fce58fcc8e9c53869bdd07a0c61e38ddf2965071"
+            build_type: autoconf
+
+          # ── SQLite (macOS amd64) ───────────────────────────────────────────
           - package: sqlite
             os: darwin
             arch: amd64
@@ -114,6 +76,9 @@ jobs:
             version: "3.46.1"
             source_url: "https://www.sqlite.org/2024/sqlite-autoconf-3460100.tar.gz"
             source_sha256: "67d3fe6d268e6eaddcae3727fce58fcc8e9c53869bdd07a0c61e38ddf2965071"
+            build_type: autoconf
+
+          # ── SQLite (macOS arm64) ───────────────────────────────────────────
           - package: sqlite
             os: darwin
             arch: arm64
@@ -121,38 +86,50 @@ jobs:
             version: "3.46.1"
             source_url: "https://www.sqlite.org/2024/sqlite-autoconf-3460100.tar.gz"
             source_sha256: "67d3fe6d268e6eaddcae3727fce58fcc8e9c53869bdd07a0c61e38ddf2965071"
+            build_type: autoconf
+
+          # ── SQLite (Windows amd64) — use cmake amalgamation ───────────────
           - package: sqlite
             os: windows
             arch: amd64
             runner: windows-2022
             version: "3.46.1"
-            source_url: "https://www.sqlite.org/2024/sqlite-autoconf-3460100.tar.gz"
-            source_sha256: "67d3fe6d268e6eaddcae3727fce58fcc8e9c53869bdd07a0c61e38ddf2965071"
+            # amalgamation zip works cleanly with cmake on Windows
+            source_url: "https://www.sqlite.org/2024/sqlite-amalgamation-3460100.zip"
+            source_sha256: "6a70e416a45b5e0f9dd147b4a51fe0e3356cf54f9f8b3df5e0f47fc8c3e33549"
+            build_type: cmake_amalgamation
 
-          # ── zlib ──────────────────────────────────────────────────────────
+          # ── zlib (Linux amd64) ────────────────────────────────────────────
           - package: zlib
             os: linux
             arch: amd64
             runner: ubuntu-22.04
             version: "1.3.1"
-            source_url: "https://zlib.net/zlib-1.3.1.tar.gz"
+            source_url: "https://github.com/madler/zlib/releases/download/v1.3.1/zlib-1.3.1.tar.gz"
             source_sha256: "9a93b2b7dfdac77ceba5a558a580e74667dd6fede4585b91eefb60f03b72df23"
+            build_type: cmake
+
+          # ── zlib (macOS arm64) ────────────────────────────────────────────
           - package: zlib
             os: darwin
             arch: arm64
             runner: macos-14
             version: "1.3.1"
-            source_url: "https://zlib.net/zlib-1.3.1.tar.gz"
+            source_url: "https://github.com/madler/zlib/releases/download/v1.3.1/zlib-1.3.1.tar.gz"
             source_sha256: "9a93b2b7dfdac77ceba5a558a580e74667dd6fede4585b91eefb60f03b72df23"
+            build_type: cmake
+
+          # ── zlib (Windows amd64) ─────────────────────────────────────────
           - package: zlib
             os: windows
             arch: amd64
             runner: windows-2022
             version: "1.3.1"
-            source_url: "https://zlib.net/zlib-1.3.1.tar.gz"
+            source_url: "https://github.com/madler/zlib/releases/download/v1.3.1/zlib-1.3.1.tar.gz"
             source_sha256: "9a93b2b7dfdac77ceba5a558a580e74667dd6fede4585b91eefb60f03b72df23"
+            build_type: cmake
 
-          # ── Lua ───────────────────────────────────────────────────────────
+          # ── Lua (Linux amd64) ─────────────────────────────────────────────
           - package: lua
             os: linux
             arch: amd64
@@ -160,6 +137,9 @@ jobs:
             version: "5.4.7"
             source_url: "https://www.lua.org/ftp/lua-5.4.7.tar.gz"
             source_sha256: "9fbf5e28ef86c69858f6d3d34eccc32e911c1a28b4120ff3e84aaa70cfbf1e30"
+            build_type: lua_make
+
+          # ── Lua (macOS arm64) ─────────────────────────────────────────────
           - package: lua
             os: darwin
             arch: arm64
@@ -167,15 +147,20 @@ jobs:
             version: "5.4.7"
             source_url: "https://www.lua.org/ftp/lua-5.4.7.tar.gz"
             source_sha256: "9fbf5e28ef86c69858f6d3d34eccc32e911c1a28b4120ff3e84aaa70cfbf1e30"
+            build_type: lua_make
 
-          # ── Zig ───────────────────────────────────────────────────────────
+          # ── Zig 0.13.0 prebuilt (Linux amd64) ────────────────────────────
           - package: zig
             os: linux
             arch: amd64
             runner: ubuntu-22.04
             version: "0.13.0"
             source_url: "https://ziglang.org/download/0.13.0/zig-linux-x86_64-0.13.0.tar.xz"
+            # Fetched from https://ziglang.org/download/0.13.0/zig-0.13.0-release-notes.html
             source_sha256: "d45312e61ebcc48032b77bc4cf7fd6915c11fa16e4aad116b66c9468211230ea"
+            build_type: zig_prebuilt
+
+          # ── Zig 0.13.0 prebuilt (Linux arm64) ────────────────────────────
           - package: zig
             os: linux
             arch: arm64
@@ -183,13 +168,19 @@ jobs:
             version: "0.13.0"
             source_url: "https://ziglang.org/download/0.13.0/zig-linux-aarch64-0.13.0.tar.xz"
             source_sha256: "041ac42323837eb5624068acd8b00cd5777dac4cf91179e8dad7a7e90dd0bf37"
+            build_type: zig_prebuilt
+
+          # ── Zig 0.13.0 prebuilt (macOS arm64) ────────────────────────────
           - package: zig
             os: darwin
-            arch: aarch64
+            arch: arm64
             runner: macos-14
             version: "0.13.0"
             source_url: "https://ziglang.org/download/0.13.0/zig-macos-aarch64-0.13.0.tar.xz"
             source_sha256: "46fae219656545b6af4b4a28e4e4de34b0547bba47c6fe887ad89c5a5c5c8193"
+            build_type: zig_prebuilt
+
+          # ── Zig 0.13.0 prebuilt (Windows amd64) ──────────────────────────
           - package: zig
             os: windows
             arch: amd64
@@ -197,51 +188,75 @@ jobs:
             version: "0.13.0"
             source_url: "https://ziglang.org/download/0.13.0/zig-windows-x86_64-0.13.0.zip"
             source_sha256: "d859994725ef9402381e557c60bb57497215682e355204cc476e8a7c36e30f49"
+            build_type: zig_prebuilt
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      # ── Install build dependencies (Linux) ────────────────────────────────
-      - name: Install build dependencies (Linux)
+      # ── Platform-specific tool installation ──────────────────────────────
+      - name: Install tools (Linux)
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends \
             build-essential cmake ninja-build pkg-config \
-            libgmp-dev libmpfr-dev libmpc-dev zlib1g-dev \
-            xz-utils wget curl
+            zlib1g-dev xz-utils curl zstd
 
-      # ── Install build dependencies (macOS) ────────────────────────────────
-      - name: Install build dependencies (macOS)
+      - name: Install tools (macOS)
         if: runner.os == 'macOS'
         run: |
-          brew install cmake ninja pkg-config gmp mpfr libmpc xz
+          brew install cmake ninja zstd xz
 
-      # ── Install build dependencies (Windows) ──────────────────────────────
-      - name: Install build dependencies (Windows)
+      - name: Install tools (Windows)
         if: runner.os == 'Windows'
+        shell: pwsh
         run: |
-          choco install -y cmake ninja 7zip
+          choco install -y cmake --installargs 'ADD_CMAKE_TO_PATH=System'
+          choco install -y ninja 7zip
 
-      # ── Download and verify source ────────────────────────────────────────
+      # ── Download source ───────────────────────────────────────────────────
       - name: Download source archive
         shell: bash
         run: |
           mkdir -p build/src
           ARCHIVE_NAME=$(basename "${{ matrix.source_url }}")
-          curl -fsSL --retry 3 -o "build/src/${ARCHIVE_NAME}" "${{ matrix.source_url }}"
-          echo "Downloaded: ${ARCHIVE_NAME}"
+          curl -fsSL --retry 5 --retry-delay 3 \
+            -o "build/src/${ARCHIVE_NAME}" "${{ matrix.source_url }}"
+          echo "Downloaded ${ARCHIVE_NAME}"
 
-      - name: Verify source checksum
+      # ── Verify checksum (cross-platform) ─────────────────────────────────
+      - name: Verify source checksum (Linux)
+        if: runner.os == 'Linux'
         shell: bash
         run: |
           ARCHIVE_NAME=$(basename "${{ matrix.source_url }}")
           echo "${{ matrix.source_sha256 }}  build/src/${ARCHIVE_NAME}" | sha256sum --check
-          echo "Source checksum verified."
+          echo "✓ Checksum verified"
+
+      - name: Verify source checksum (macOS)
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          ARCHIVE_NAME=$(basename "${{ matrix.source_url }}")
+          echo "${{ matrix.source_sha256 }}  build/src/${ARCHIVE_NAME}" | shasum -a 256 --check
+          echo "✓ Checksum verified"
+
+      - name: Verify source checksum (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $archive = "build/src/$((Split-Path '${{ matrix.source_url }}' -Leaf))"
+          $expected = "${{ matrix.source_sha256 }}"
+          $actual = (Get-FileHash $archive -Algorithm SHA256).Hash.ToLower()
+          if ($actual -ne $expected) {
+            Write-Error "Checksum mismatch: expected $expected, got $actual"
+            exit 1
+          }
+          Write-Host "✓ Checksum verified"
 
       # ── Extract source ────────────────────────────────────────────────────
-      - name: Extract source
+      - name: Extract source (Unix)
+        if: runner.os != 'Windows'
         shell: bash
         run: |
           ARCHIVE_NAME=$(basename "${{ matrix.source_url }}")
@@ -251,113 +266,213 @@ jobs:
               tar -xf "build/src/${ARCHIVE_NAME}" -C build/source --strip-components=1
               ;;
             *.zip)
-              mkdir -p build/source_zip
-              cd build/source_zip
-              unzip -q "../../build/src/${ARCHIVE_NAME}"
-              INNER=$(ls -d */ | head -1)
-              mv "${INNER}"* ../source/ 2>/dev/null || mv "${INNER}"/* ../source/
+              TMP=$(mktemp -d)
+              unzip -q "build/src/${ARCHIVE_NAME}" -d "${TMP}"
+              # Move contents of the single top-level directory.
+              INNER=$(find "${TMP}" -mindepth 1 -maxdepth 1 -type d | head -1)
+              mv "${INNER}"/* build/source/
               ;;
           esac
           echo "Source extracted."
 
-      # ── Build (autoconf) ──────────────────────────────────────────────────
-      - name: Configure and build (autoconf)
-        if: ${{ contains(fromJSON('["gcc","binutils","sqlite","lua"]'), matrix.package) }}
+      - name: Extract source (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $archive = "build/src/$((Split-Path '${{ matrix.source_url }}' -Leaf))"
+          New-Item -ItemType Directory -Force build\source | Out-Null
+          $ext = $archive -replace '.*(\.[^.]+)$','$1'
+          if ($archive -match '\.zip$') {
+            $tmp = New-TemporaryFile | ForEach-Object { Remove-Item $_; New-Item -Type Directory $_ }
+            Expand-Archive -Path $archive -DestinationPath $tmp
+            $inner = Get-ChildItem $tmp | Select-Object -First 1
+            Get-ChildItem $inner.FullName | ForEach-Object { Move-Item $_.FullName build\source\ }
+          } elseif ($archive -match '\.tar\.(gz|xz|bz2)$') {
+            tar -xf $archive -C build\source --strip-components=1
+          }
+          Write-Host "Source extracted."
+
+      # ── Build: autoconf (SQLite Linux/macOS) ─────────────────────────────
+      - name: Build (autoconf)
+        if: matrix.build_type == 'autoconf'
         shell: bash
         run: |
           INSTALL_DIR="${PWD}/build/install"
           mkdir -p build/build_dir
           cd build/build_dir
-
-          EXTRA_FLAGS=""
-          case "${{ matrix.package }}" in
-            gcc)
-              EXTRA_FLAGS="--enable-languages=c,c++,fortran --disable-multilib --disable-bootstrap"
-              ;;
-            binutils)
-              EXTRA_FLAGS="--enable-gold --enable-plugins --disable-werror"
-              ;;
-            sqlite)
-              EXTRA_FLAGS="--enable-shared --enable-static --enable-threadsafe"
-              ;;
-            lua)
-              # Lua uses plain make, not autoconf.
-              cd ../source
-              case "${{ matrix.os }}" in
-                linux)  make -j$(nproc) INSTALL_TOP="${INSTALL_DIR}" linux install ;;
-                darwin) make -j$(sysctl -n hw.ncpu) INSTALL_TOP="${INSTALL_DIR}" macosx install ;;
-              esac
-              exit 0
-              ;;
-          esac
-
           ../source/configure \
             --prefix="${INSTALL_DIR}" \
-            ${EXTRA_FLAGS} \
-            --with-system-zlib 2>&1 | tail -20
-
-          make -j$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4)
+            --enable-shared \
+            --enable-static \
+            --enable-threadsafe \
+            --disable-werror 2>&1 | tail -5
+          make -j$(nproc 2>/dev/null || sysctl -n hw.ncpu)
           make install
 
-      # ── Build (cmake / zig prebuilt) ───────────────────────────────────────
-      - name: Configure and build (cmake/prebuilt)
-        if: ${{ contains(fromJSON('["zlib","zig"]'), matrix.package) }}
+      # ── Build: cmake (zlib all platforms) ────────────────────────────────
+      - name: Build (cmake) Unix
+        if: matrix.build_type == 'cmake' && runner.os != 'Windows'
         shell: bash
         run: |
           INSTALL_DIR="${PWD}/build/install"
-          case "${{ matrix.package }}" in
-            zlib)
-              cmake -S build/source -B build/build_dir \
-                -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
-                -DBUILD_SHARED_LIBS=ON \
-                -DCMAKE_BUILD_TYPE=Release
-              cmake --build build/build_dir --parallel
-              cmake --install build/build_dir
-              ;;
-            zig)
-              # Zig distributes prebuilt binaries; we repackage as a Kompa artifact.
-              mkdir -p "${INSTALL_DIR}/bin"
-              if [[ "${{ matrix.os }}" == "windows" ]]; then
-                cp build/source/zig.exe "${INSTALL_DIR}/bin/"
-              else
-                cp build/source/zig "${INSTALL_DIR}/bin/"
-                chmod +x "${INSTALL_DIR}/bin/zig"
-              fi
-              cp -r build/source/lib "${INSTALL_DIR}/" 2>/dev/null || true
-              cp -r build/source/doc "${INSTALL_DIR}/" 2>/dev/null || true
-              ;;
+          cmake -S build/source -B build/build_dir \
+            -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
+            -DBUILD_SHARED_LIBS=ON \
+            -DCMAKE_BUILD_TYPE=Release \
+            -G Ninja
+          cmake --build build/build_dir --parallel
+          cmake --install build/build_dir
+
+      - name: Build (cmake) Windows
+        if: matrix.build_type == 'cmake' && runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $INSTALL_DIR = "$PWD\build\install"
+          cmake -S build\source -B build\build_dir `
+            -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" `
+            -DBUILD_SHARED_LIBS=ON `
+            -DCMAKE_BUILD_TYPE=Release
+          cmake --build build\build_dir --config Release --parallel
+          cmake --install build\build_dir --config Release
+
+      # ── Build: cmake amalgamation (SQLite Windows) ───────────────────────
+      - name: Build SQLite (cmake amalgamation, Windows)
+        if: matrix.build_type == 'cmake_amalgamation'
+        shell: pwsh
+        run: |
+          # The amalgamation zip contains sqlite3.c, sqlite3.h, sqlite3ext.h, shell.c
+          $SRC = "$PWD\build\source"
+          $BUILD = "$PWD\build\build_dir"
+          $INSTALL = "$PWD\build\install"
+          New-Item -ItemType Directory -Force $BUILD, "$INSTALL\bin", "$INSTALL\lib", "$INSTALL\include" | Out-Null
+
+          # Write a minimal CMakeLists.txt to build the amalgamation
+          @"
+          cmake_minimum_required(VERSION 3.16)
+          project(sqlite3 C)
+          add_library(sqlite3 SHARED sqlite3.c)
+          target_compile_definitions(sqlite3 PRIVATE
+            SQLITE_ENABLE_MATH_FUNCTIONS SQLITE_ENABLE_FTS5
+            SQLITE_ENABLE_RTREE SQLITE_THREADSAFE=1 SQLITE_DQS=0)
+          set_target_properties(sqlite3 PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
+          add_executable(sqlite3_shell shell.c)
+          target_link_libraries(sqlite3_shell sqlite3)
+          set_target_properties(sqlite3_shell PROPERTIES OUTPUT_NAME sqlite3)
+          install(TARGETS sqlite3 sqlite3_shell
+            RUNTIME DESTINATION bin
+            LIBRARY DESTINATION lib
+            ARCHIVE DESTINATION lib)
+          install(FILES sqlite3.h sqlite3ext.h DESTINATION include)
+          "@ | Set-Content "$SRC\CMakeLists.txt"
+
+          cmake -S $SRC -B $BUILD -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$INSTALL
+          cmake --build $BUILD --config Release --parallel
+          cmake --install $BUILD --config Release
+
+      # ── Build: Lua (Linux/macOS) ──────────────────────────────────────────
+      - name: Build Lua (make)
+        if: matrix.build_type == 'lua_make'
+        shell: bash
+        run: |
+          INSTALL_DIR="${PWD}/build/install"
+          mkdir -p "${INSTALL_DIR}"
+          cd build/source
+
+          # Determine Lua make platform target
+          case "${{ matrix.os }}" in
+            linux)  PLAT=linux ;;
+            darwin) PLAT=macosx ;;
+            *)      PLAT=posix ;;
           esac
 
-      # ── Package artifact ──────────────────────────────────────────────────
-      - name: Package artifact
+          NPROC=$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4)
+
+          # Build first, then install — Lua's Makefile requires this order.
+          make -j${NPROC} MYCFLAGS="-fPIC" ${PLAT}
+          make install INSTALL_TOP="${INSTALL_DIR}"
+
+      # ── Build: Zig (prebuilt repackage) ──────────────────────────────────
+      - name: Repackage Zig (Unix)
+        if: matrix.build_type == 'zig_prebuilt' && runner.os != 'Windows'
+        shell: bash
+        run: |
+          INSTALL_DIR="${PWD}/build/install"
+          mkdir -p "${INSTALL_DIR}/bin"
+          cp build/source/zig "${INSTALL_DIR}/bin/zig"
+          chmod +x "${INSTALL_DIR}/bin/zig"
+          # Include stdlib
+          cp -r build/source/lib "${INSTALL_DIR}/" 2>/dev/null || true
+          cp -r build/source/doc "${INSTALL_DIR}/" 2>/dev/null || true
+          echo "Zig version: $("${INSTALL_DIR}/bin/zig" version)"
+
+      - name: Repackage Zig (Windows)
+        if: matrix.build_type == 'zig_prebuilt' && runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $INSTALL = "$PWD\build\install"
+          New-Item -ItemType Directory -Force "$INSTALL\bin" | Out-Null
+          Copy-Item build\source\zig.exe "$INSTALL\bin\zig.exe"
+          if (Test-Path build\source\lib)  { Copy-Item -Recurse build\source\lib  "$INSTALL\lib" }
+          if (Test-Path build\source\doc)  { Copy-Item -Recurse build\source\doc  "$INSTALL\doc" }
+          $ver = & "$INSTALL\bin\zig.exe" version
+          Write-Host "Zig version: $ver"
+
+      # ── Package artifact (Unix: tar.zst) ─────────────────────────────────
+      - name: Package artifact (Unix)
+        if: runner.os != 'Windows'
         shell: bash
         run: |
           INSTALL_DIR="${PWD}/build/install"
           ARTIFACT_DIR="${PWD}/artifacts"
           mkdir -p "${ARTIFACT_DIR}"
 
-          ARTIFACT_NAME="${{ matrix.package }}-${{ matrix.os }}-${{ matrix.arch }}"
-
-          if [[ "${{ matrix.os }}" == "windows" ]]; then
-            cd "${INSTALL_DIR}"
-            zip -r "${ARTIFACT_DIR}/${ARTIFACT_NAME}.zip" .
-            ARTIFACT_FILE="${ARTIFACT_NAME}.zip"
-          else
-            # Use zstd compression for smaller archives.
-            tar -C "${INSTALL_DIR}" \
-                --use-compress-program "zstd -T0 -19" \
-                -cf "${ARTIFACT_DIR}/${ARTIFACT_NAME}.tar.zst" \
-                .
-            ARTIFACT_FILE="${ARTIFACT_NAME}.tar.zst"
+          # Verify something was actually installed
+          if [ -z "$(ls -A ${INSTALL_DIR} 2>/dev/null)" ]; then
+            echo "ERROR: install directory is empty!"
+            exit 1
           fi
 
-          # Generate checksum.
-          cd "${ARTIFACT_DIR}"
-          sha256sum "${ARTIFACT_FILE}" > "${ARTIFACT_FILE}.sha256"
-          echo "ARTIFACT_FILE=${ARTIFACT_FILE}" >> "$GITHUB_ENV"
-          echo "ARTIFACT_NAME=${ARTIFACT_NAME}" >> "$GITHUB_ENV"
+          ARTIFACT_NAME="${{ matrix.package }}-${{ matrix.os }}-${{ matrix.arch }}"
+          ARTIFACT_FILE="${ARTIFACT_NAME}.tar.zst"
 
-      # ── Upload artifact ───────────────────────────────────────────────────
+          tar -C "${INSTALL_DIR}" \
+              -c . \
+              | zstd -T0 -19 -o "${ARTIFACT_DIR}/${ARTIFACT_FILE}"
+
+          cd "${ARTIFACT_DIR}"
+          # macOS uses shasum; Linux uses sha256sum
+          if command -v sha256sum &>/dev/null; then
+            sha256sum "${ARTIFACT_FILE}" > "${ARTIFACT_FILE}.sha256"
+          else
+            shasum -a 256 "${ARTIFACT_FILE}" > "${ARTIFACT_FILE}.sha256"
+          fi
+          echo "Packaged: ${ARTIFACT_FILE} ($(du -sh ${ARTIFACT_FILE} | cut -f1))"
+
+      # ── Package artifact (Windows: zip) ──────────────────────────────────
+      - name: Package artifact (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $INSTALL = "$PWD\build\install"
+          $ARTIFACTS = "$PWD\artifacts"
+          New-Item -ItemType Directory -Force $ARTIFACTS | Out-Null
+
+          if (-not (Get-ChildItem $INSTALL -ErrorAction SilentlyContinue)) {
+            Write-Error "Install directory is empty!"
+            exit 1
+          }
+
+          $ARTIFACT_NAME = "${{ matrix.package }}-${{ matrix.os }}-${{ matrix.arch }}"
+          $ARTIFACT_FILE = "${ARTIFACT_NAME}.zip"
+
+          # Use 7zip for reliable Windows zip creation
+          & "C:\Program Files\7-Zip\7z.exe" a -tzip "$ARTIFACTS\$ARTIFACT_FILE" "$INSTALL\*"
+
+          $hash = (Get-FileHash "$ARTIFACTS\$ARTIFACT_FILE" -Algorithm SHA256).Hash.ToLower()
+          "$hash  $ARTIFACT_FILE" | Set-Content "$ARTIFACTS\$ARTIFACT_FILE.sha256"
+          Write-Host "Packaged: $ARTIFACT_FILE"
+
+      # ── Upload ────────────────────────────────────────────────────────────
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
@@ -365,17 +480,16 @@ jobs:
           path: artifacts/
           retention-days: 7
 
-  # -------------------------------------------------------------------------
-  # Collect all built artifacts, generate manifest.json, create the release.
-  # -------------------------------------------------------------------------
+  # ── Generate manifest and publish release ─────────────────────────────────
   release:
-    name: Create Release ${{ needs.next-tag.outputs.tag }}
+    name: Publish release ${{ needs.next-tag.outputs.tag }}
     needs: [next-tag, build]
     runs-on: ubuntu-latest
     if: always()
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Download all artifacts
         uses: actions/download-artifact@v4
@@ -383,18 +497,13 @@ jobs:
           path: release-artifacts
           merge-multiple: true
 
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: "1.22"
-
       - name: Generate manifest.json
         env:
           RELEASE_TAG: ${{ needs.next-tag.outputs.tag }}
           REPO: kompa-tbm/kompa
         run: |
-          cat > /tmp/gen_manifest.py << 'PYEOF'
-          import json, os, hashlib, glob, sys
+          python3 - << 'PYEOF'
+          import json, os, glob
           from datetime import datetime, timezone
 
           tag = os.environ["RELEASE_TAG"]
@@ -403,26 +512,27 @@ jobs:
           artifact_dir = "release-artifacts"
 
           packages = []
-          for sha_file in glob.glob(f"{artifact_dir}/**/*.sha256", recursive=True):
+          for sha_file in sorted(glob.glob(f"{artifact_dir}/**/*.sha256", recursive=True)):
               with open(sha_file) as f:
                   line = f.read().strip()
-              sha256, archive_name = line.split(None, 1)
-              archive_name = os.path.basename(archive_name.strip())
+              parts = line.split(None, 1)
+              if len(parts) != 2:
+                  continue
+              sha256 = parts[0]
+              archive_name = os.path.basename(parts[1].strip())
 
-              # Parse "name-os-arch.ext" from archive name.
               base = archive_name
               for ext in [".tar.zst", ".tar.gz", ".tar.xz", ".zip"]:
                   if base.endswith(ext):
                       base = base[:-len(ext)]
                       break
 
-              parts = base.split("-")
-              if len(parts) < 3:
+              segs = base.split("-")
+              if len(segs) < 3:
                   continue
-
-              pkg_name = parts[0]
-              pkg_os = parts[1]
-              pkg_arch = "-".join(parts[2:])
+              pkg_name = segs[0]
+              pkg_os   = segs[1]
+              pkg_arch = "-".join(segs[2:])
 
               archive_path = os.path.join(os.path.dirname(sha_file), archive_name)
               size = os.path.getsize(archive_path) if os.path.exists(archive_path) else 0
@@ -451,19 +561,18 @@ jobs:
               "kompa_version": "0.1.0",
               "packages": packages,
           }
-
-          with open("release-artifacts/manifest.json", "w") as f:
+          out = "release-artifacts/manifest.json"
+          with open(out, "w") as f:
               json.dump(manifest, f, indent=2)
-          print(f"Generated manifest with {len(packages)} package entries.")
+          print(f"Generated manifest with {len(packages)} package entries → {out}")
           PYEOF
-          python3 /tmp/gen_manifest.py
 
-      - name: Tag the release
+      - name: Create and push tag
         run: |
           TAG="${{ needs.next-tag.outputs.tag }}"
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag -a "${TAG}" -m "Release ${TAG}"
+          git tag -a "${TAG}" -m "Toolchain release ${TAG}"
           git push origin "${TAG}"
 
       - name: Create GitHub Release
@@ -476,17 +585,14 @@ jobs:
           body: |
             ## Toolchain Release ${{ needs.next-tag.outputs.tag }}
 
-            This release was automatically generated by Kompa's CI system.
-            Packages were built from official upstream sources and verified against their published checksums.
+            Pre-built packages from official upstream sources, verified by SHA-256.
 
-            ### Installing a package
-
+            ### Install
             ```bash
-            kompa install gcc
             kompa install sqlite
+            kompa install zlib
+            kompa install lua
             kompa install zig
             ```
 
-            ### Manifest
-
-            The `manifest.json` file lists all available packages with their download URLs and SHA-256 checksums.
+            The `manifest.json` attached to this release lists all packages with their checksums and download URLs.
