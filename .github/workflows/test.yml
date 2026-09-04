@@ -1,0 +1,46 @@
+name: Test
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+jobs:
+  test:
+    name: Test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+          cache: true
+
+      - name: Download dependencies
+        run: go mod download
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Test
+        run: go test -race -count=1 -timeout=120s ./...
+
+      - name: Build CLI (smoke test)
+        run: go build -ldflags "-X github.com/kompa-tbm/kompa/internal/cli.Version=ci-test" ./cmd/kompa
+
+      - name: Version output (smoke test)
+        run: ./kompa version
+        if: runner.os != 'Windows'
+
+      - name: Version output (smoke test - Windows)
+        run: .\kompa.exe version
+        if: runner.os == 'Windows'

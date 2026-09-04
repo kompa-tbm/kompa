@@ -1,0 +1,167 @@
+name: Release Kompa CLI
+
+# Triggered on every push to main — creates a sequential vN tag and publishes
+# pre-built Kompa CLI binaries for all supported platforms.
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  # ── Determine next sequential tag ─────────────────────────────────────────
+  next-tag:
+    name: Determine next release tag
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
+      already_exists: ${{ steps.tag.outputs.already_exists }}
+    steps:
+      - name: Checkout (full history for tag listing)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Compute next vN tag
+        id: tag
+        run: |
+          MAX=0
+          while IFS= read -r t; do
+            N="${t#v}"
+            if [[ "$N" =~ ^[0-9]+$ ]] && (( N > MAX )); then
+              MAX=$N
+            fi
+          done < <(git tag --list 'v[0-9]*')
+          NEXT=$((MAX + 1))
+          echo "tag=v${NEXT}" >> "$GITHUB_OUTPUT"
+          echo "already_exists=false" >> "$GITHUB_OUTPUT"
+          echo "Next release tag will be v${NEXT}"
+
+  # ── Run tests before releasing ─────────────────────────────────────────────
+  test:
+    name: Run tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+          cache: true
+      - run: go vet ./...
+      - run: go test -race -count=1 -timeout=120s ./...
+
+  # ── Build CLI for all platforms ────────────────────────────────────────────
+  build:
+    name: Build CLI (${{ matrix.goos }}/${{ matrix.goarch }})
+    needs: [next-tag, test]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {goos: linux,   goarch: amd64,  suffix: ""}
+          - {goos: linux,   goarch: arm64,  suffix: ""}
+          - {goos: linux,   goarch: "386",  suffix: ""}
+          - {goos: darwin,  goarch: amd64,  suffix: ""}
+          - {goos: darwin,  goarch: arm64,  suffix: ""}
+          - {goos: windows, goarch: amd64,  suffix: ".exe"}
+          - {goos: windows, goarch: arm64,  suffix: ".exe"}
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+          cache: true
+
+      - name: Build
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+          CGO_ENABLED: "0"
+        run: |
+          TAG="${{ needs.next-tag.outputs.tag }}"
+          ASSET="kompa-${{ matrix.goos }}-${{ matrix.goarch }}${{ matrix.suffix }}"
+          mkdir -p dist
+          go build \
+            -ldflags "-X github.com/kompa-tbm/kompa/internal/cli.Version=${TAG} -s -w" \
+            -o "dist/${ASSET}" \
+            ./cmd/kompa
+          cd dist
+          sha256sum "${ASSET}" > "${ASSET}.sha256"
+          echo "Built ${ASSET}"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cli-${{ matrix.goos }}-${{ matrix.goarch }}
+          path: dist/
+
+  # ── Publish release ────────────────────────────────────────────────────────
+  release:
+    name: Publish release ${{ needs.next-tag.outputs.tag }}
+    needs: [next-tag, build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download all CLI artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: List artifacts
+        run: ls -lh dist/
+
+      - name: Create and push tag
+        run: |
+          TAG="${{ needs.next-tag.outputs.tag }}"
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "${TAG}" -m "Release ${TAG} [skip ci]"
+          git push origin "${TAG}"
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.next-tag.outputs.tag }}
+          name: "Kompa ${{ needs.next-tag.outputs.tag }}"
+          files: dist/**
+          generate_release_notes: true
+          body: |
+            ## Kompa ${{ needs.next-tag.outputs.tag }}
+
+            CLI release automatically generated from commit ${{ github.sha }}.
+
+            ### Quick install
+
+            **Linux (amd64):**
+            ```bash
+            curl -Lo kompa https://github.com/kompa-tbm/kompa/releases/download/${{ needs.next-tag.outputs.tag }}/kompa-linux-amd64
+            chmod +x kompa && sudo mv kompa /usr/local/bin/
+            ```
+
+            **macOS (Apple Silicon):**
+            ```bash
+            curl -Lo kompa https://github.com/kompa-tbm/kompa/releases/download/${{ needs.next-tag.outputs.tag }}/kompa-darwin-arm64
+            chmod +x kompa && sudo mv kompa /usr/local/bin/
+            ```
+
+            **Windows (amd64):** Download `kompa-windows-amd64.exe`, rename to `kompa.exe`, add to PATH.
+
+            ### Verify checksums
+            ```bash
+            sha256sum -c kompa-linux-amd64.sha256
+            ```
+
+            ### Usage
+            ```
+            kompa install gcc
+            kompa install sqlite lua zlib
+            kompa list
+            eval "$(kompa env --shell bash)"
+            ```

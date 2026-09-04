@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "name": "ffmpeg",
+  "version": "7.0.2",
+  "description": "FFmpeg - complete, cross-platform solution for audio and video processing",
+  "homepage": "https://ffmpeg.org",
+  "license": "LGPL-2.1",
+  "source_repo": "https://git.ffmpeg.org/ffmpeg.git",
+  "source_url": "https://ffmpeg.org/releases/ffmpeg-7.0.2.tar.xz",
+  "source_tag": "n7.0.2",
+  "build_system": "custom",
+  "configure_args": [
+    "--enable-shared",
+    "--enable-static",
+    "--enable-gpl",
+    "--enable-version3",
+    "--enable-nonfree",
+    "--enable-libx264",
+    "--enable-libx265",
+    "--enable-libvpx",
+    "--enable-libopus",
+    "--enable-libvorbis",
+    "--enable-libmp3lame",
+    "--disable-debug"
+  ],
+  "make_targets": ["all", "install"],
+  "artifact_format": "tar.zst",
+  "dependencies": ["zlib"],
+  "supported_platforms": [
+    {"os": "linux",   "arch": "amd64"},
+    {"os": "linux",   "arch": "arm64"},
+    {"os": "darwin",  "arch": "amd64"},
+    {"os": "darwin",  "arch": "arm64"},
+    {"os": "windows", "arch": "amd64"}
+  ],
+  "binaries": ["ffmpeg", "ffprobe", "ffplay"],
+  "libraries": ["libavcodec", "libavformat", "libavutil", "libswscale", "libswresample"],
+  "headers": ["libavcodec", "libavformat", "libavutil"],
+  "tags": ["media", "audio", "video", "library"]
+}

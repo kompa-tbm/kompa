@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "name": "binutils",
+  "version": "2.42",
+  "description": "GNU Binutils - assembler, linker, and binary utilities",
+  "homepage": "https://www.gnu.org/software/binutils/",
+  "license": "GPL-3.0",
+  "source_repo": "https://sourceware.org/git/binutils-gdb.git",
+  "source_url": "https://ftp.gnu.org/gnu/binutils/binutils-2.42.tar.xz",
+  "source_tag": "binutils-2_42",
+  "source_sha256": "f6e4d41fd5fc778b06b7891457b3620da5ecea1006c6a4a41ae998109f85a800",
+  "build_system": "autoconf",
+  "configure_args": [
+    "--enable-shared",
+    "--enable-gold",
+    "--enable-plugins",
+    "--enable-deterministic-archives",
+    "--disable-werror"
+  ],
+  "make_targets": ["all", "install"],
+  "artifact_format": "tar.zst",
+  "dependencies": [],
+  "supported_platforms": [
+    {"os": "linux",   "arch": "amd64"},
+    {"os": "linux",   "arch": "arm64"},
+    {"os": "linux",   "arch": "386"},
+    {"os": "darwin",  "arch": "amd64", "unsupported_reason": "macOS ships its own ld/binutils via Xcode; GNU binutils conflicts with the native toolchain"},
+    {"os": "darwin",  "arch": "arm64", "unsupported_reason": "macOS ships its own ld/binutils via Xcode; GNU binutils conflicts with the native toolchain"},
+    {"os": "windows", "arch": "amd64", "unsupported_reason": "GNU binutils on Windows requires a MinGW cross-compilation environment"}
+  ],
+  "binaries": ["as", "ld", "ar", "nm", "objdump", "objcopy", "ranlib", "readelf", "size", "strings", "strip"],
+  "tags": ["toolchain", "gnu", "linker", "assembler"]
+}

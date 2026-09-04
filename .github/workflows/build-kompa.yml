@@ -1,0 +1,125 @@
+name: Build Kompa CLI
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build (${{ matrix.goos }}/${{ matrix.goarch }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - goos: linux
+            goarch: amd64
+            asset_name: kompa-linux-amd64
+          - goos: linux
+            goarch: arm64
+            asset_name: kompa-linux-arm64
+          - goos: linux
+            goarch: "386"
+            asset_name: kompa-linux-386
+          - goos: darwin
+            goarch: amd64
+            asset_name: kompa-darwin-amd64
+          - goos: darwin
+            goarch: arm64
+            asset_name: kompa-darwin-arm64
+          - goos: windows
+            goarch: amd64
+            asset_name: kompa-windows-amd64.exe
+          - goos: windows
+            goarch: arm64
+            asset_name: kompa-windows-arm64.exe
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+          cache: true
+
+      - name: Determine version from tag
+        id: version
+        run: |
+          TAG="${GITHUB_REF_NAME:-dev}"
+          echo "version=${TAG}" >> "$GITHUB_OUTPUT"
+
+      - name: Build
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+          CGO_ENABLED: "0"
+        run: |
+          go build \
+            -ldflags "-X github.com/kompa-tbm/kompa/internal/cli.Version=${{ steps.version.outputs.version }} -s -w" \
+            -o dist/${{ matrix.asset_name }} \
+            ./cmd/kompa
+
+      - name: Generate checksum
+        run: |
+          cd dist
+          sha256sum ${{ matrix.asset_name }} > ${{ matrix.asset_name }}.sha256
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.asset_name }}
+          path: |
+            dist/${{ matrix.asset_name }}
+            dist/${{ matrix.asset_name }}.sha256
+
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: List artifacts
+        run: ls -lh dist/
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/**
+          generate_release_notes: true
+          tag_name: ${{ github.ref_name }}
+          name: "Kompa ${{ github.ref_name }}"
+          body: |
+            ## Kompa ${{ github.ref_name }}
+
+            ### Installation
+
+            Download the binary for your platform below, make it executable, and place it on your PATH.
+
+            **Linux/macOS:**
+            ```bash
+            # Linux amd64
+            curl -Lo kompa https://github.com/kompa-tbm/kompa/releases/download/${{ github.ref_name }}/kompa-linux-amd64
+            chmod +x kompa
+            sudo mv kompa /usr/local/bin/
+            ```
+
+            **Windows:**
+            Download `kompa-windows-amd64.exe`, rename to `kompa.exe`, and add to your PATH.
+
+            ### Verify checksums
+            Each binary has a corresponding `.sha256` file. Verify with:
+            ```bash
+            sha256sum -c kompa-linux-amd64.sha256
+            ```

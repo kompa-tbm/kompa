@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "name": "gcc",
+  "version": "14.2.0",
+  "description": "GNU Compiler Collection - C, C++, Fortran, and more",
+  "homepage": "https://gcc.gnu.org",
+  "license": "GPL-3.0",
+  "source_repo": "https://gcc.gnu.org/git/gcc.git",
+  "source_url": "https://ftp.gnu.org/gnu/gcc/gcc-14.2.0/gcc-14.2.0.tar.xz",
+  "source_tag": "releases/gcc-14.2.0",
+  "source_sha256": "a7b39bc69cbf9e25826c5a60ab26477001f7c08d85cec04bc0e29cabed6f3cc9",
+  "build_system": "autoconf",
+  "configure_args": [
+    "--enable-languages=c,c++,fortran",
+    "--disable-multilib",
+    "--enable-shared",
+    "--enable-static",
+    "--with-system-zlib",
+    "--enable-__cxa_atexit",
+    "--enable-threads=posix",
+    "--enable-checking=release",
+    "--disable-bootstrap"
+  ],
+  "make_targets": ["all", "install"],
+  "artifact_format": "tar.zst",
+  "dependencies": ["binutils"],
+  "build_dependencies": ["gmp", "mpfr", "mpc"],
+  "supported_platforms": [
+    {"os": "linux",   "arch": "amd64"},
+    {"os": "linux",   "arch": "arm64"},
+    {"os": "linux",   "arch": "386"},
+    {"os": "darwin",  "arch": "amd64"},
+    {"os": "darwin",  "arch": "arm64"},
+    {"os": "windows", "arch": "amd64", "unsupported_reason": "GCC on Windows requires MinGW/Cygwin cross-compilation environment; use the mingw-w64 variant instead"}
+  ],
+  "binaries": ["gcc", "g++", "cpp", "gcov", "gcc-ar", "gcc-nm", "gcc-ranlib"],
+  "libraries": ["libgcc_s", "libstdc++", "libgomp"],
+  "headers": ["c++", "sys-include"],
+  "runtime_env": [
+    {"name": "CC",  "value": "gcc"},
+    {"name": "CXX", "value": "g++"}
+  ],
+  "tags": ["compiler", "c", "c++", "gnu", "toolchain"]
+}

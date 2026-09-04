@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "name": "llvm",
+  "version": "18.1.8",
+  "description": "LLVM compiler infrastructure and toolchain utilities",
+  "homepage": "https://llvm.org",
+  "license": "Apache-2.0",
+  "source_repo": "https://github.com/llvm/llvm-project",
+  "source_url": "https://github.com/llvm/llvm-project/releases/download/llvmorg-18.1.8/llvm-project-18.1.8.src.tar.xz",
+  "source_tag": "llvmorg-18.1.8",
+  "build_system": "cmake",
+  "configure_args": [
+    "-DLLVM_ENABLE_PROJECTS=llvm",
+    "-DCMAKE_BUILD_TYPE=Release",
+    "-DLLVM_TARGETS_TO_BUILD=X86;AArch64;RISCV",
+    "-DLLVM_ENABLE_ASSERTIONS=OFF",
+    "-DLLVM_INCLUDE_TESTS=OFF",
+    "-DLLVM_INCLUDE_BENCHMARKS=OFF"
+  ],
+  "make_targets": ["all", "install"],
+  "artifact_format": "tar.zst",
+  "dependencies": [],
+  "supported_platforms": [
+    {"os": "linux",   "arch": "amd64"},
+    {"os": "linux",   "arch": "arm64"},
+    {"os": "darwin",  "arch": "amd64"},
+    {"os": "darwin",  "arch": "arm64"},
+    {"os": "windows", "arch": "amd64"}
+  ],
+  "binaries": ["llvm-ar", "llvm-as", "llvm-dis", "llvm-link", "llvm-nm", "llvm-objdump", "llvm-ranlib", "llvm-strip", "opt", "llc"],
+  "libraries": ["libLLVM"],
+  "tags": ["toolchain", "llvm", "compiler-infrastructure"]
+}

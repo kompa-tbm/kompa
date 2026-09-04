@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "name": "lua",
+  "version": "5.4.7",
+  "description": "Lua scripting language - lightweight, embeddable scripting",
+  "homepage": "https://www.lua.org",
+  "license": "MIT",
+  "source_repo": "https://github.com/lua/lua",
+  "source_url": "https://www.lua.org/ftp/lua-5.4.7.tar.gz",
+  "source_tag": "v5.4.7",
+  "source_sha256": "9fbf5e28ef86c69858f6d3d34eccc32e911c1a28b4120ff3e84aaa70cfbf1e30",
+  "build_system": "make",
+  "make_targets": ["all", "install"],
+  "artifact_format": "tar.zst",
+  "dependencies": [],
+  "supported_platforms": [
+    {"os": "linux",   "arch": "amd64"},
+    {"os": "linux",   "arch": "arm64"},
+    {"os": "linux",   "arch": "386"},
+    {"os": "darwin",  "arch": "amd64"},
+    {"os": "darwin",  "arch": "arm64"},
+    {"os": "windows", "arch": "amd64"}
+  ],
+  "binaries": ["lua", "luac"],
+  "libraries": ["liblua"],
+  "headers": ["lua.h", "lualib.h", "lauxlib.h", "lua.hpp"],
+  "runtime_env": [
+    {"name": "LUA_PATH", "value": "{{install_dir}}/share/lua/5.4/?.lua;{{install_dir}}/share/lua/5.4/?/init.lua;./?.lua", "prepend": false}
+  ],
+  "tags": ["scripting", "language", "library", "embeddable"]
+}

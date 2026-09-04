@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "name": "ghc",
+  "version": "9.8.2",
+  "description": "Glasgow Haskell Compiler",
+  "homepage": "https://www.haskell.org/ghc/",
+  "license": "BSD-3-Clause",
+  "source_repo": "https://gitlab.haskell.org/ghc/ghc",
+  "source_url": "https://downloads.haskell.org/~ghc/9.8.2/ghc-9.8.2-src.tar.xz",
+  "source_tag": "ghc-9.8.2-release",
+  "build_system": "autoconf",
+  "configure_args": [
+    "--disable-numa",
+    "--enable-tarballs-autodownload"
+  ],
+  "make_targets": ["all", "install"],
+  "artifact_format": "tar.zst",
+  "dependencies": [],
+  "build_dependencies": [],
+  "supported_platforms": [
+    {"os": "linux",   "arch": "amd64"},
+    {"os": "linux",   "arch": "arm64"},
+    {"os": "darwin",  "arch": "amd64"},
+    {"os": "darwin",  "arch": "arm64"},
+    {"os": "windows", "arch": "amd64"}
+  ],
+  "binaries": ["ghc", "ghci", "runghc", "cabal"],
+  "tags": ["compiler", "language", "haskell", "functional"]
+}

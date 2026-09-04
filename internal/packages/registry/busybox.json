@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "name": "busybox",
+  "version": "1.36.1",
+  "description": "BusyBox - the Swiss Army knife of embedded Linux",
+  "homepage": "https://busybox.net",
+  "license": "GPL-2.0",
+  "source_repo": "https://git.busybox.net/busybox",
+  "source_url": "https://busybox.net/downloads/busybox-1.36.1.tar.bz2",
+  "source_tag": "1_36_1",
+  "source_sha256": "b8cc24c9574d809e7279c3be349795c5d5ceb6fdf19ca709f80cde50e47de314",
+  "build_system": "make",
+  "make_targets": ["defconfig", "all", "install"],
+  "artifact_format": "tar.zst",
+  "dependencies": [],
+  "supported_platforms": [
+    {"os": "linux",   "arch": "amd64"},
+    {"os": "linux",   "arch": "arm64"},
+    {"os": "linux",   "arch": "386"},
+    {"os": "darwin",  "arch": "amd64", "unsupported_reason": "BusyBox is Linux-specific and cannot be built natively on macOS"},
+    {"os": "darwin",  "arch": "arm64", "unsupported_reason": "BusyBox is Linux-specific and cannot be built natively on macOS"},
+    {"os": "windows", "arch": "amd64", "unsupported_reason": "BusyBox is Linux-specific and cannot be built natively on Windows"}
+  ],
+  "binaries": ["busybox"],
+  "tags": ["tools", "linux", "system", "embedded"]
+}

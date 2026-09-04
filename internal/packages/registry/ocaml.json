@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "name": "ocaml",
+  "version": "5.2.0",
+  "description": "OCaml programming language compiler and runtime",
+  "homepage": "https://ocaml.org",
+  "license": "LGPL-2.1",
+  "source_repo": "https://github.com/ocaml/ocaml",
+  "source_url": "https://github.com/ocaml/ocaml/archive/refs/tags/5.2.0.tar.gz",
+  "source_tag": "5.2.0",
+  "build_system": "autoconf",
+  "configure_args": [
+    "--enable-shared",
+    "--enable-debugger",
+    "--enable-ocamldoc"
+  ],
+  "make_targets": ["world", "opt", "install"],
+  "artifact_format": "tar.zst",
+  "dependencies": [],
+  "supported_platforms": [
+    {"os": "linux",   "arch": "amd64"},
+    {"os": "linux",   "arch": "arm64"},
+    {"os": "darwin",  "arch": "amd64"},
+    {"os": "darwin",  "arch": "arm64"},
+    {"os": "windows", "arch": "amd64", "unsupported_reason": "OCaml on Windows requires Cygwin or WSL; native Windows build is not supported in this CI configuration"}
+  ],
+  "binaries": ["ocaml", "ocamlopt", "ocamlc", "ocamlfind", "ocamldep", "ocamldebug"],
+  "tags": ["compiler", "language", "functional"]
+}

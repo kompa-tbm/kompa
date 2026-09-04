@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "name": "sqlite",
+  "version": "3.46.1",
+  "description": "SQLite - self-contained, serverless, zero-configuration SQL database engine",
+  "homepage": "https://www.sqlite.org",
+  "license": "Public Domain",
+  "source_repo": "https://github.com/sqlite/sqlite",
+  "source_url": "https://www.sqlite.org/2024/sqlite-autoconf-3460100.tar.gz",
+  "source_tag": "version-3.46.1",
+  "source_sha256": "67d3fe6d268e6eaddcae3727fce58fcc8e9c53869bdd07a0c61e38ddf2965071",
+  "build_system": "autoconf",
+  "configure_args": [
+    "--enable-shared",
+    "--enable-static",
+    "--enable-readline",
+    "--enable-threadsafe",
+    "--enable-dynamic-extensions"
+  ],
+  "make_targets": ["all", "install"],
+  "artifact_format": "tar.zst",
+  "dependencies": [],
+  "supported_platforms": [
+    {"os": "linux",   "arch": "amd64"},
+    {"os": "linux",   "arch": "arm64"},
+    {"os": "linux",   "arch": "386"},
+    {"os": "darwin",  "arch": "amd64"},
+    {"os": "darwin",  "arch": "arm64"},
+    {"os": "windows", "arch": "amd64"},
+    {"os": "windows", "arch": "arm64"}
+  ],
+  "binaries": ["sqlite3"],
+  "libraries": ["libsqlite3"],
+  "headers": ["sqlite3.h", "sqlite3ext.h"],
+  "tags": ["database", "library", "sql"]
+}

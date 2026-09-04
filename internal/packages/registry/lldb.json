@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "name": "lldb",
+  "version": "18.1.8",
+  "description": "LLVM debugger - next-generation debugger built on LLVM",
+  "homepage": "https://lldb.llvm.org",
+  "license": "Apache-2.0",
+  "source_repo": "https://github.com/llvm/llvm-project",
+  "source_url": "https://github.com/llvm/llvm-project/releases/download/llvmorg-18.1.8/llvm-project-18.1.8.src.tar.xz",
+  "source_tag": "llvmorg-18.1.8",
+  "build_system": "cmake",
+  "configure_args": [
+    "-DLLVM_ENABLE_PROJECTS=clang;lldb",
+    "-DCMAKE_BUILD_TYPE=Release",
+    "-DLLVM_TARGETS_TO_BUILD=X86;AArch64",
+    "-DLLDB_ENABLE_PYTHON=OFF",
+    "-DLLVM_INCLUDE_TESTS=OFF"
+  ],
+  "make_targets": ["lldb", "install-lldb"],
+  "artifact_format": "tar.zst",
+  "dependencies": ["llvm"],
+  "supported_platforms": [
+    {"os": "linux",  "arch": "amd64"},
+    {"os": "linux",  "arch": "arm64"},
+    {"os": "darwin", "arch": "amd64"},
+    {"os": "darwin", "arch": "arm64"}
+  ],
+  "binaries": ["lldb", "lldb-server"],
+  "tags": ["debugger", "llvm", "toolchain"]
+}

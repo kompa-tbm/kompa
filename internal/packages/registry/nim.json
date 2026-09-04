@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "name": "nim",
+  "version": "2.0.8",
+  "description": "Nim programming language compiler and standard library",
+  "homepage": "https://nim-lang.org",
+  "license": "MIT",
+  "source_repo": "https://github.com/nim-lang/Nim",
+  "source_url": "https://github.com/nim-lang/Nim/archive/refs/tags/v2.0.8.tar.gz",
+  "source_tag": "v2.0.8",
+  "build_system": "custom",
+  "make_targets": ["all"],
+  "artifact_format": "tar.zst",
+  "dependencies": [],
+  "supported_platforms": [
+    {"os": "linux",   "arch": "amd64"},
+    {"os": "linux",   "arch": "arm64"},
+    {"os": "darwin",  "arch": "amd64"},
+    {"os": "darwin",  "arch": "arm64"},
+    {"os": "windows", "arch": "amd64"}
+  ],
+  "binaries": ["nim", "nimble", "nimsuggest"],
+  "runtime_env": [
+    {"name": "PATH", "value": "{{install_dir}}/bin", "prepend": true}
+  ],
+  "tags": ["compiler", "language", "toolchain"]
+}
