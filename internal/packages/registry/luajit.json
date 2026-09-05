@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "name": "luajit",
+  "version": "2.1.0-beta3",
+  "description": "Just-in-time compiler for the Lua programming language",
+  "homepage": "https://luajit.org",
+  "license": "MIT",
+  "source_repo": "https://github.com/LuaJIT/LuaJIT",
+  "source_url": "http://luajit.org/download/LuaJIT-2.1.0-beta3.tar.gz",
+  "source_tag": "v2.1.0-beta3",
+  "source_sha256": "1ad2e34b111c802f9d0cdf019e986909123237a28c746b21295b63c9e785d9c3",
+  "build_system": "make",
+  "make_targets": ["all", "install"],
+  "artifact_format": "tar.zst",
+  "dependencies": [],
+  "supported_platforms": [
+    {"os": "linux",  "arch": "amd64"},
+    {"os": "linux",  "arch": "arm64"},
+    {"os": "darwin", "arch": "arm64"}
+  ],
+  "binaries": ["luajit"],
+  "libraries": ["libluajit-5.1"],
+  "headers": ["lua.h", "lualib.h", "lauxlib.h", "luajit.h", "lua.hpp"],
+  "runtime_env": [
+    {"name": "LUA_PATH", "value": "{{install_dir}}/share/luajit-2.1/?.lua;./?.lua", "prepend": false}
+  ],
+  "tags": ["scripting", "language", "jit", "library"],
+  "platform_note": "Windows LuaJIT requires the separate msvcbuild.bat toolchain rather than `make`, so it is not covered by this package's Windows entry."
+}

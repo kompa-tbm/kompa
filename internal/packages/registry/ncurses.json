@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "name": "ncurses",
+  "version": "6.5",
+  "description": "Library for terminal-independent text-based user interfaces",
+  "homepage": "https://invisible-island.net/ncurses/",
+  "license": "X11-distribute-modifications-variant",
+  "source_repo": "https://github.com/mirror/ncurses",
+  "source_url": "https://ftp.gnu.org/gnu/ncurses/ncurses-6.5.tar.gz",
+  "source_tag": "v6_5",
+  "source_sha256": "136d91bc269a9a5785e5f9e980bc76ab57428f604ce3e5a5a90cebc767971cc6",
+  "build_system": "autoconf",
+  "artifact_format": "tar.zst",
+  "dependencies": [],
+  "supported_platforms": [
+    {"os": "linux",  "arch": "amd64"},
+    {"os": "linux",  "arch": "arm64"},
+    {"os": "darwin", "arch": "arm64"}
+  ],
+  "binaries": ["tic", "toe", "tput", "tset", "infocmp", "clear", "reset"],
+  "libraries": ["libncurses", "libncursesw", "libpanel", "libform", "libmenu"],
+  "headers": ["curses.h", "ncurses.h", "term.h", "panel.h", "form.h", "menu.h"],
+  "runtime_env": [
+    {"name": "TERMINFO", "value": "{{install_dir}}/share/terminfo", "prepend": false}
+  ],
+  "tags": ["terminal", "tui", "library"]
+}

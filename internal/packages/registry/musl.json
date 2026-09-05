@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "name": "musl",
+  "version": "1.2.5",
+  "description": "Lightweight, fast, and standards-conformant C standard library implementation",
+  "homepage": "https://musl.libc.org",
+  "license": "MIT",
+  "source_repo": "https://git.musl-libc.org/cgit/musl",
+  "source_url": "https://musl.libc.org/releases/musl-1.2.5.tar.gz",
+  "source_tag": "v1.2.5",
+  "source_sha256": "PLEASE_VERIFY_SHA256",
+  "build_system": "autoconf",
+  "artifact_format": "tar.zst",
+  "dependencies": [],
+  "supported_platforms": [
+    {"os": "linux", "arch": "amd64"},
+    {"os": "linux", "arch": "arm64"}
+  ],
+  "binaries": ["musl-gcc"],
+  "libraries": ["libc"],
+  "headers": [],
+  "runtime_env": [],
+  "tags": ["libc", "cross-compilation", "static-linking"],
+  "checksum_note": "source_sha256 is a placeholder — could not be independently confirmed from a citable source during authoring. Verify against musl-1.2.5.tar.gz.asc before use.",
+  "platform_note": "musl is a libc replacement, not applicable to macOS or Windows, so this package is Linux-only."
+}

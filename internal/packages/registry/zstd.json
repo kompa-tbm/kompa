@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "name": "zstd",
+  "version": "1.5.6",
+  "description": "Zstandard - fast lossless compression algorithm targeting real-time scenarios",
+  "homepage": "https://facebook.github.io/zstd/",
+  "license": "BSD-3-Clause OR GPL-2.0-or-later",
+  "source_repo": "https://github.com/facebook/zstd",
+  "source_url": "https://github.com/facebook/zstd/archive/refs/tags/v1.5.6.tar.gz",
+  "source_tag": "v1.5.6",
+  "source_sha256": "30f35f71c1203369dc979ecde0400ffea93c27391bfd2ac5a9715d2173d92ff7",
+  "build_system": "cmake",
+  "cmake_source_subdir": "build/cmake",
+  "artifact_format": "tar.zst",
+  "dependencies": [],
+  "supported_platforms": [
+    {"os": "linux",   "arch": "amd64"},
+    {"os": "linux",   "arch": "arm64"},
+    {"os": "darwin",  "arch": "arm64"},
+    {"os": "windows", "arch": "amd64"}
+  ],
+  "binaries": ["zstd", "zstdmt", "zstdgrep", "zstdless"],
+  "libraries": ["libzstd"],
+  "headers": ["zstd.h", "zdict.h", "zstd_errors.h"],
+  "runtime_env": [],
+  "tags": ["compression", "library", "cli"]
+}

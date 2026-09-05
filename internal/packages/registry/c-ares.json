@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "name": "c-ares",
+  "version": "1.34.6",
+  "description": "C library for asynchronous DNS requests, including name resolution",
+  "homepage": "https://c-ares.org/",
+  "license": "MIT",
+  "source_repo": "https://github.com/c-ares/c-ares",
+  "source_url": "https://github.com/c-ares/c-ares/releases/download/v1.34.6/c-ares-1.34.6.tar.gz",
+  "source_tag": "v1.34.6",
+  "source_sha256": "PLEASE_VERIFY_SHA256",
+  "build_system": "cmake",
+  "artifact_format": "tar.zst",
+  "dependencies": [],
+  "supported_platforms": [
+    {"os": "linux",   "arch": "amd64"},
+    {"os": "linux",   "arch": "arm64"},
+    {"os": "darwin",  "arch": "arm64"},
+    {"os": "windows", "arch": "amd64"}
+  ],
+  "binaries": [],
+  "libraries": ["libcares"],
+  "headers": ["ares.h", "ares_dns.h", "ares_version.h"],
+  "runtime_env": [],
+  "tags": ["dns", "networking", "library"],
+  "checksum_note": "source_sha256 is a placeholder — could not be independently confirmed from a citable source during authoring. Verify against the release's .asc signature or SLSA provenance (c-ares-1.34.6.intoto.jsonl) before use."
+}

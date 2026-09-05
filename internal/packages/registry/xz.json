@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "name": "xz",
+  "version": "5.4.6",
+  "description": "General-purpose data compression with high compression ratio (XZ/LZMA formats)",
+  "homepage": "https://tukaani.org/xz/",
+  "license": "0BSD AND LGPL-2.1-or-later AND GPL-2.0-or-later AND GPL-3.0-or-later",
+  "source_repo": "https://github.com/tukaani-project/xz",
+  "source_url": "https://github.com/tukaani-project/xz/releases/download/v5.4.6/xz-5.4.6.tar.gz",
+  "source_tag": "v5.4.6",
+  "source_sha256": "aeba3e03bf8140ddedf62a0a367158340520f6b384f75ca6045ccc6c0d43fd5c",
+  "build_system": "autoconf",
+  "artifact_format": "tar.zst",
+  "dependencies": [],
+  "supported_platforms": [
+    {"os": "linux",  "arch": "amd64"},
+    {"os": "linux",  "arch": "arm64"},
+    {"os": "darwin", "arch": "arm64"}
+  ],
+  "binaries": ["xz", "xzdec", "lzmadec", "xzcat", "unxz"],
+  "libraries": ["liblzma"],
+  "headers": ["lzma.h"],
+  "runtime_env": [],
+  "tags": ["compression", "library", "cli"],
+  "security_note": "Pinned to 5.4.6 deliberately. xz 5.6.0 and 5.6.1 contained the CVE-2024-3094 supply-chain backdoor; do not bump past that pin without checking upstream advisories."
+}

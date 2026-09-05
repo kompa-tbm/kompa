@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "name": "libffi",
+  "version": "3.4.6",
+  "description": "Portable foreign function interface library for calling code across language boundaries",
+  "homepage": "https://sourceware.org/libffi/",
+  "license": "MIT",
+  "source_repo": "https://github.com/libffi/libffi",
+  "source_url": "https://github.com/libffi/libffi/releases/download/v3.4.6/libffi-3.4.6.tar.gz",
+  "source_tag": "v3.4.6",
+  "source_sha256": "b0dea9df23c863a7a50e825440f3ebffabd65df1497108e5d437747843895a4e",
+  "build_system": "autoconf",
+  "artifact_format": "tar.zst",
+  "dependencies": [],
+  "supported_platforms": [
+    {"os": "linux",  "arch": "amd64"},
+    {"os": "linux",  "arch": "arm64"},
+    {"os": "darwin", "arch": "arm64"}
+  ],
+  "binaries": [],
+  "libraries": ["libffi"],
+  "headers": ["ffi.h", "ffitarget.h"],
+  "runtime_env": [],
+  "tags": ["ffi", "runtime", "library"]
+}

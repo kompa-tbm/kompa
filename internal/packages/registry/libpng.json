@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "name": "libpng",
+  "version": "1.6.58",
+  "description": "Official PNG reference library for reading and writing PNG image files",
+  "homepage": "https://www.libpng.org/pub/png/libpng.html",
+  "license": "libpng-2.0",
+  "source_repo": "https://github.com/pnggroup/libpng",
+  "source_url": "https://downloads.sourceforge.net/project/libpng/libpng16/1.6.58/libpng-1.6.58.tar.xz",
+  "source_tag": "v1.6.58",
+  "source_sha256": "28eb403f51f0f7405249132cecfe82ea5c0ef97f1b32c5a65828814ae0d34775",
+  "build_system": "cmake",
+  "artifact_format": "tar.zst",
+  "dependencies": ["zlib"],
+  "supported_platforms": [
+    {"os": "linux",   "arch": "amd64"},
+    {"os": "linux",   "arch": "arm64"},
+    {"os": "darwin",  "arch": "arm64"},
+    {"os": "windows", "arch": "amd64"}
+  ],
+  "binaries": ["png-fix-itxt", "pngfix"],
+  "libraries": ["libpng16"],
+  "headers": ["png.h", "pngconf.h", "pnglibconf.h"],
+  "runtime_env": [],
+  "tags": ["image", "compression", "library"]
+}

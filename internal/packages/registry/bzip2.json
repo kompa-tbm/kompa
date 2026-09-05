@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "name": "bzip2",
+  "version": "1.0.8",
+  "description": "Freely available, high-quality Burrows-Wheeler block-sorting data compressor",
+  "homepage": "https://sourceware.org/bzip2/",
+  "license": "bzip2-1.0.6",
+  "source_repo": "https://sourceware.org/git/bzip2.git",
+  "source_url": "https://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz",
+  "source_tag": "bzip2-1.0.8",
+  "source_sha256": "ab5a03176ee106d3f0fa90e381da478ddae405918153cca248e682cd0c4a2269",
+  "build_system": "make",
+  "make_targets": ["all", "install"],
+  "artifact_format": "tar.zst",
+  "dependencies": [],
+  "supported_platforms": [
+    {"os": "linux",  "arch": "amd64"},
+    {"os": "linux",  "arch": "arm64"},
+    {"os": "darwin", "arch": "arm64"}
+  ],
+  "binaries": ["bzip2", "bunzip2", "bzcat", "bzip2recover"],
+  "libraries": ["libbz2"],
+  "headers": ["bzlib.h"],
+  "runtime_env": [],
+  "tags": ["compression", "library", "cli"]
+}

@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "name": "mruby",
+  "version": "3.3.0",
+  "description": "Lightweight, embeddable implementation of the Ruby language",
+  "homepage": "https://mruby.org/",
+  "license": "MIT",
+  "source_repo": "https://github.com/mruby/mruby",
+  "source_url": "https://github.com/mruby/mruby/archive/refs/tags/3.3.0.tar.gz",
+  "source_tag": "3.3.0",
+  "source_sha256": "53088367e3d7657eb722ddfacb938f74aed1f8538b3717fe0b6eb8f58402af65",
+  "build_system": "rake",
+  "make_targets": ["all"],
+  "artifact_format": "tar.zst",
+  "dependencies": [],
+  "supported_platforms": [
+    {"os": "linux",  "arch": "amd64"},
+    {"os": "darwin", "arch": "arm64"}
+  ],
+  "binaries": ["mruby", "mrbc", "mirb"],
+  "libraries": ["libmruby"],
+  "headers": ["mruby.h"],
+  "runtime_env": [],
+  "tags": ["scripting", "language", "embeddable"],
+  "build_note": "Requires a host Ruby (used only for the rake-based build system) and bison. Linux arm64 and Windows are not covered — mruby's rake/gembox build has not been validated for cross-compilation or MSVC in this workflow."
+}

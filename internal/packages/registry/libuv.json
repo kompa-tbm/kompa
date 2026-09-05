@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "name": "libuv",
+  "version": "1.51.0",
+  "description": "Multi-platform support library with a focus on asynchronous I/O",
+  "homepage": "https://libuv.org",
+  "license": "MIT",
+  "source_repo": "https://github.com/libuv/libuv",
+  "source_url": "https://github.com/libuv/libuv/archive/refs/tags/v1.51.0.tar.gz",
+  "source_tag": "v1.51.0",
+  "source_sha256": "27e55cf7083913bfb6826ca78cde9de7647cded648d35f24163f2d31bb9f51cd",
+  "build_system": "cmake",
+  "artifact_format": "tar.zst",
+  "dependencies": [],
+  "supported_platforms": [
+    {"os": "linux",   "arch": "amd64"},
+    {"os": "linux",   "arch": "arm64"},
+    {"os": "darwin",  "arch": "arm64"},
+    {"os": "windows", "arch": "amd64"}
+  ],
+  "binaries": [],
+  "libraries": ["libuv"],
+  "headers": ["uv.h"],
+  "runtime_env": [],
+  "tags": ["async-io", "event-loop", "library"]
+}

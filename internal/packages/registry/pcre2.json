@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "name": "pcre2",
+  "version": "10.47",
+  "description": "Perl Compatible Regular Expressions library with the modern PCRE2 API",
+  "homepage": "https://www.pcre.org/",
+  "license": "BSD-3-Clause",
+  "source_repo": "https://github.com/PCRE2Project/pcre2",
+  "source_url": "https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.47/pcre2-10.47.tar.bz2",
+  "source_tag": "pcre2-10.47",
+  "source_sha256": "47fe8c99461250d42f89e6e8fdaeba9da057855d06eb7fc08d9ca03fd08d7bc7",
+  "build_system": "cmake",
+  "artifact_format": "tar.zst",
+  "dependencies": ["bzip2", "zlib"],
+  "supported_platforms": [
+    {"os": "linux",   "arch": "amd64"},
+    {"os": "linux",   "arch": "arm64"},
+    {"os": "darwin",  "arch": "arm64"},
+    {"os": "windows", "arch": "amd64"}
+  ],
+  "binaries": ["pcre2grep", "pcre2test"],
+  "libraries": ["libpcre2-8", "libpcre2-16", "libpcre2-32", "libpcre2-posix"],
+  "headers": ["pcre2.h", "pcre2posix.h"],
+  "runtime_env": [],
+  "tags": ["regex", "text", "library"]
+}

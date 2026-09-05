@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "name": "libjpeg-turbo",
+  "version": "3.1.3",
+  "description": "JPEG image codec that uses SIMD instructions to accelerate compression and decompression",
+  "homepage": "https://www.libjpeg-turbo.org/",
+  "license": "IJG AND Zlib AND BSD-3-Clause",
+  "source_repo": "https://github.com/libjpeg-turbo/libjpeg-turbo",
+  "source_url": "https://github.com/libjpeg-turbo/libjpeg-turbo/releases/download/3.1.3/libjpeg-turbo-3.1.3.tar.gz",
+  "source_tag": "3.1.3",
+  "source_sha256": "075920b826834ac4ddf97661cc73491047855859affd671d52079c6867c1c6c0",
+  "build_system": "cmake",
+  "artifact_format": "tar.zst",
+  "dependencies": [],
+  "supported_platforms": [
+    {"os": "linux",   "arch": "amd64"},
+    {"os": "linux",   "arch": "arm64"},
+    {"os": "darwin",  "arch": "arm64"},
+    {"os": "windows", "arch": "amd64"}
+  ],
+  "binaries": ["cjpeg", "djpeg", "jpegtran", "tjbench"],
+  "libraries": ["libjpeg", "libturbojpeg"],
+  "headers": ["jpeglib.h", "jerror.h", "jconfig.h", "jmorecfg.h", "turbojpeg.h"],
+  "runtime_env": [],
+  "tags": ["image", "compression", "library"]
+}

@@ -184,6 +184,463 @@ jobs:
             source_sha256: "d859994725ef9402381e557c60bb57497215682e355204d754ee3df75ee3c158"
             build_type: zig_prebuilt
 
+          # ══════════════════════════════════════════════════════════════════
+          # New packages below this line
+          # ══════════════════════════════════════════════════════════════════
+
+          # ── zstd (cmake, all 4 platforms) ─────────────────────────────────
+          - package: zstd
+            os: linux
+            arch: amd64
+            runner: ubuntu-22.04
+            version: "1.5.6"
+            source_url: "https://github.com/facebook/zstd/archive/refs/tags/v1.5.6.tar.gz"
+            source_sha256: "30f35f71c1203369dc979ecde0400ffea93c27391bfd2ac5a9715d2173d92ff7"
+            build_type: cmake
+            cmake_source_subdir: "build/cmake"
+
+          - package: zstd
+            os: linux
+            arch: arm64
+            runner: ubuntu-22.04-arm
+            version: "1.5.6"
+            source_url: "https://github.com/facebook/zstd/archive/refs/tags/v1.5.6.tar.gz"
+            source_sha256: "30f35f71c1203369dc979ecde0400ffea93c27391bfd2ac5a9715d2173d92ff7"
+            build_type: cmake
+            cmake_source_subdir: "build/cmake"
+
+          - package: zstd
+            os: darwin
+            arch: arm64
+            runner: macos-14
+            version: "1.5.6"
+            source_url: "https://github.com/facebook/zstd/archive/refs/tags/v1.5.6.tar.gz"
+            source_sha256: "30f35f71c1203369dc979ecde0400ffea93c27391bfd2ac5a9715d2173d92ff7"
+            build_type: cmake
+            cmake_source_subdir: "build/cmake"
+
+          - package: zstd
+            os: windows
+            arch: amd64
+            runner: windows-2022
+            version: "1.5.6"
+            source_url: "https://github.com/facebook/zstd/archive/refs/tags/v1.5.6.tar.gz"
+            source_sha256: "30f35f71c1203369dc979ecde0400ffea93c27391bfd2ac5a9715d2173d92ff7"
+            build_type: cmake
+            cmake_source_subdir: "build/cmake"
+
+          # ── libpng (cmake, all 4 platforms) ───────────────────────────────
+          - package: libpng
+            os: linux
+            arch: amd64
+            runner: ubuntu-22.04
+            version: "1.6.58"
+            source_url: "https://downloads.sourceforge.net/project/libpng/libpng16/1.6.58/libpng-1.6.58.tar.xz"
+            source_sha256: "28eb403f51f0f7405249132cecfe82ea5c0ef97f1b32c5a65828814ae0d34775"
+            build_type: cmake
+
+          - package: libpng
+            os: linux
+            arch: arm64
+            runner: ubuntu-22.04-arm
+            version: "1.6.58"
+            source_url: "https://downloads.sourceforge.net/project/libpng/libpng16/1.6.58/libpng-1.6.58.tar.xz"
+            source_sha256: "28eb403f51f0f7405249132cecfe82ea5c0ef97f1b32c5a65828814ae0d34775"
+            build_type: cmake
+
+          - package: libpng
+            os: darwin
+            arch: arm64
+            runner: macos-14
+            version: "1.6.58"
+            source_url: "https://downloads.sourceforge.net/project/libpng/libpng16/1.6.58/libpng-1.6.58.tar.xz"
+            source_sha256: "28eb403f51f0f7405249132cecfe82ea5c0ef97f1b32c5a65828814ae0d34775"
+            build_type: cmake
+
+          - package: libpng
+            os: windows
+            arch: amd64
+            runner: windows-2022
+            version: "1.6.58"
+            source_url: "https://downloads.sourceforge.net/project/libpng/libpng16/1.6.58/libpng-1.6.58.tar.xz"
+            source_sha256: "28eb403f51f0f7405249132cecfe82ea5c0ef97f1b32c5a65828814ae0d34775"
+            build_type: cmake
+
+          # ── libjpeg-turbo (cmake, all 4 platforms) ────────────────────────
+          - package: libjpeg-turbo
+            os: linux
+            arch: amd64
+            runner: ubuntu-22.04
+            version: "3.1.3"
+            source_url: "https://github.com/libjpeg-turbo/libjpeg-turbo/releases/download/3.1.3/libjpeg-turbo-3.1.3.tar.gz"
+            source_sha256: "075920b826834ac4ddf97661cc73491047855859affd671d52079c6867c1c6c0"
+            build_type: cmake
+
+          - package: libjpeg-turbo
+            os: linux
+            arch: arm64
+            runner: ubuntu-22.04-arm
+            version: "3.1.3"
+            source_url: "https://github.com/libjpeg-turbo/libjpeg-turbo/releases/download/3.1.3/libjpeg-turbo-3.1.3.tar.gz"
+            source_sha256: "075920b826834ac4ddf97661cc73491047855859affd671d52079c6867c1c6c0"
+            build_type: cmake
+
+          - package: libjpeg-turbo
+            os: darwin
+            arch: arm64
+            runner: macos-14
+            version: "3.1.3"
+            source_url: "https://github.com/libjpeg-turbo/libjpeg-turbo/releases/download/3.1.3/libjpeg-turbo-3.1.3.tar.gz"
+            source_sha256: "075920b826834ac4ddf97661cc73491047855859affd671d52079c6867c1c6c0"
+            build_type: cmake
+
+          - package: libjpeg-turbo
+            os: windows
+            arch: amd64
+            runner: windows-2022
+            version: "3.1.3"
+            source_url: "https://github.com/libjpeg-turbo/libjpeg-turbo/releases/download/3.1.3/libjpeg-turbo-3.1.3.tar.gz"
+            source_sha256: "075920b826834ac4ddf97661cc73491047855859affd671d52079c6867c1c6c0"
+            build_type: cmake
+
+          # ── pcre2 (cmake, all 4 platforms) ────────────────────────────────
+          - package: pcre2
+            os: linux
+            arch: amd64
+            runner: ubuntu-22.04
+            version: "10.47"
+            source_url: "https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.47/pcre2-10.47.tar.bz2"
+            source_sha256: "47fe8c99461250d42f89e6e8fdaeba9da057855d06eb7fc08d9ca03fd08d7bc7"
+            build_type: cmake
+
+          - package: pcre2
+            os: linux
+            arch: arm64
+            runner: ubuntu-22.04-arm
+            version: "10.47"
+            source_url: "https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.47/pcre2-10.47.tar.bz2"
+            source_sha256: "47fe8c99461250d42f89e6e8fdaeba9da057855d06eb7fc08d9ca03fd08d7bc7"
+            build_type: cmake
+
+          - package: pcre2
+            os: darwin
+            arch: arm64
+            runner: macos-14
+            version: "10.47"
+            source_url: "https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.47/pcre2-10.47.tar.bz2"
+            source_sha256: "47fe8c99461250d42f89e6e8fdaeba9da057855d06eb7fc08d9ca03fd08d7bc7"
+            build_type: cmake
+
+          - package: pcre2
+            os: windows
+            arch: amd64
+            runner: windows-2022
+            version: "10.47"
+            source_url: "https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.47/pcre2-10.47.tar.bz2"
+            source_sha256: "47fe8c99461250d42f89e6e8fdaeba9da057855d06eb7fc08d9ca03fd08d7bc7"
+            build_type: cmake
+
+          # ── expat (cmake, all 4 platforms) ────────────────────────────────
+          - package: expat
+            os: linux
+            arch: amd64
+            runner: ubuntu-22.04
+            version: "2.8.2"
+            source_url: "https://github.com/libexpat/libexpat/releases/download/R_2_8_2/expat-2.8.2.tar.xz"
+            source_sha256: "3ad89b8588e6644bd4e49981480d48b21289eebbcd4f0a1a4afb1c29f99b6ab4"
+            build_type: cmake
+
+          - package: expat
+            os: linux
+            arch: arm64
+            runner: ubuntu-22.04-arm
+            version: "2.8.2"
+            source_url: "https://github.com/libexpat/libexpat/releases/download/R_2_8_2/expat-2.8.2.tar.xz"
+            source_sha256: "3ad89b8588e6644bd4e49981480d48b21289eebbcd4f0a1a4afb1c29f99b6ab4"
+            build_type: cmake
+
+          - package: expat
+            os: darwin
+            arch: arm64
+            runner: macos-14
+            version: "2.8.2"
+            source_url: "https://github.com/libexpat/libexpat/releases/download/R_2_8_2/expat-2.8.2.tar.xz"
+            source_sha256: "3ad89b8588e6644bd4e49981480d48b21289eebbcd4f0a1a4afb1c29f99b6ab4"
+            build_type: cmake
+
+          - package: expat
+            os: windows
+            arch: amd64
+            runner: windows-2022
+            version: "2.8.2"
+            source_url: "https://github.com/libexpat/libexpat/releases/download/R_2_8_2/expat-2.8.2.tar.xz"
+            source_sha256: "3ad89b8588e6644bd4e49981480d48b21289eebbcd4f0a1a4afb1c29f99b6ab4"
+            build_type: cmake
+
+          # ── c-ares (cmake, all 4 platforms) ───────────────────────────────
+          # NOTE: source_sha256 below could not be independently confirmed
+          # against a citable checksum source during authoring — verify it
+          # against the release's .asc signature or SLSA provenance before
+          # relying on this in production.
+          - package: c-ares
+            os: linux
+            arch: amd64
+            runner: ubuntu-22.04
+            version: "1.34.6"
+            source_url: "https://github.com/c-ares/c-ares/releases/download/v1.34.6/c-ares-1.34.6.tar.gz"
+            source_sha256: "PLEASE_VERIFY_SHA256"
+            build_type: cmake
+
+          - package: c-ares
+            os: linux
+            arch: arm64
+            runner: ubuntu-22.04-arm
+            version: "1.34.6"
+            source_url: "https://github.com/c-ares/c-ares/releases/download/v1.34.6/c-ares-1.34.6.tar.gz"
+            source_sha256: "PLEASE_VERIFY_SHA256"
+            build_type: cmake
+
+          - package: c-ares
+            os: darwin
+            arch: arm64
+            runner: macos-14
+            version: "1.34.6"
+            source_url: "https://github.com/c-ares/c-ares/releases/download/v1.34.6/c-ares-1.34.6.tar.gz"
+            source_sha256: "PLEASE_VERIFY_SHA256"
+            build_type: cmake
+
+          - package: c-ares
+            os: windows
+            arch: amd64
+            runner: windows-2022
+            version: "1.34.6"
+            source_url: "https://github.com/c-ares/c-ares/releases/download/v1.34.6/c-ares-1.34.6.tar.gz"
+            source_sha256: "PLEASE_VERIFY_SHA256"
+            build_type: cmake
+
+          # ── libuv (cmake, all 4 platforms) ────────────────────────────────
+          - package: libuv
+            os: linux
+            arch: amd64
+            runner: ubuntu-22.04
+            version: "1.51.0"
+            source_url: "https://github.com/libuv/libuv/archive/refs/tags/v1.51.0.tar.gz"
+            source_sha256: "27e55cf7083913bfb6826ca78cde9de7647cded648d35f24163f2d31bb9f51cd"
+            build_type: cmake
+
+          - package: libuv
+            os: linux
+            arch: arm64
+            runner: ubuntu-22.04-arm
+            version: "1.51.0"
+            source_url: "https://github.com/libuv/libuv/archive/refs/tags/v1.51.0.tar.gz"
+            source_sha256: "27e55cf7083913bfb6826ca78cde9de7647cded648d35f24163f2d31bb9f51cd"
+            build_type: cmake
+
+          - package: libuv
+            os: darwin
+            arch: arm64
+            runner: macos-14
+            version: "1.51.0"
+            source_url: "https://github.com/libuv/libuv/archive/refs/tags/v1.51.0.tar.gz"
+            source_sha256: "27e55cf7083913bfb6826ca78cde9de7647cded648d35f24163f2d31bb9f51cd"
+            build_type: cmake
+
+          - package: libuv
+            os: windows
+            arch: amd64
+            runner: windows-2022
+            version: "1.51.0"
+            source_url: "https://github.com/libuv/libuv/archive/refs/tags/v1.51.0.tar.gz"
+            source_sha256: "27e55cf7083913bfb6826ca78cde9de7647cded648d35f24163f2d31bb9f51cd"
+            build_type: cmake
+
+          # ── ncurses (autoconf, Linux + macOS only — no official Windows
+          #    autotools build without MSYS) ────────────────────────────────
+          - package: ncurses
+            os: linux
+            arch: amd64
+            runner: ubuntu-22.04
+            version: "6.5"
+            source_url: "https://ftp.gnu.org/gnu/ncurses/ncurses-6.5.tar.gz"
+            source_sha256: "136d91bc269a9a5785e5f9e980bc76ab57428f604ce3e5a5a90cebc767971cc6"
+            build_type: autoconf
+
+          - package: ncurses
+            os: linux
+            arch: arm64
+            runner: ubuntu-22.04-arm
+            version: "6.5"
+            source_url: "https://ftp.gnu.org/gnu/ncurses/ncurses-6.5.tar.gz"
+            source_sha256: "136d91bc269a9a5785e5f9e980bc76ab57428f604ce3e5a5a90cebc767971cc6"
+            build_type: autoconf
+
+          - package: ncurses
+            os: darwin
+            arch: arm64
+            runner: macos-14
+            version: "6.5"
+            source_url: "https://ftp.gnu.org/gnu/ncurses/ncurses-6.5.tar.gz"
+            source_sha256: "136d91bc269a9a5785e5f9e980bc76ab57428f604ce3e5a5a90cebc767971cc6"
+            build_type: autoconf
+
+          # ── xz / liblzma (autoconf, Linux + macOS only) ───────────────────
+          # NOTE: pinned to 5.4.6 deliberately — 5.6.0/5.6.1 contained the
+          # CVE-2024-3094 supply-chain backdoor. Do not bump to 5.6.0/5.6.1.
+          - package: xz
+            os: linux
+            arch: amd64
+            runner: ubuntu-22.04
+            version: "5.4.6"
+            source_url: "https://github.com/tukaani-project/xz/releases/download/v5.4.6/xz-5.4.6.tar.gz"
+            source_sha256: "aeba3e03bf8140ddedf62a0a367158340520f6b384f75ca6045ccc6c0d43fd5c"
+            build_type: autoconf
+
+          - package: xz
+            os: linux
+            arch: arm64
+            runner: ubuntu-22.04-arm
+            version: "5.4.6"
+            source_url: "https://github.com/tukaani-project/xz/releases/download/v5.4.6/xz-5.4.6.tar.gz"
+            source_sha256: "aeba3e03bf8140ddedf62a0a367158340520f6b384f75ca6045ccc6c0d43fd5c"
+            build_type: autoconf
+
+          - package: xz
+            os: darwin
+            arch: arm64
+            runner: macos-14
+            version: "5.4.6"
+            source_url: "https://github.com/tukaani-project/xz/releases/download/v5.4.6/xz-5.4.6.tar.gz"
+            source_sha256: "aeba3e03bf8140ddedf62a0a367158340520f6b384f75ca6045ccc6c0d43fd5c"
+            build_type: autoconf
+
+          # ── libffi (autoconf, Linux + macOS only) ─────────────────────────
+          - package: libffi
+            os: linux
+            arch: amd64
+            runner: ubuntu-22.04
+            version: "3.4.6"
+            source_url: "https://github.com/libffi/libffi/releases/download/v3.4.6/libffi-3.4.6.tar.gz"
+            source_sha256: "b0dea9df23c863a7a50e825440f3ebffabd65df1497108e5d437747843895a4e"
+            build_type: autoconf
+
+          - package: libffi
+            os: linux
+            arch: arm64
+            runner: ubuntu-22.04-arm
+            version: "3.4.6"
+            source_url: "https://github.com/libffi/libffi/releases/download/v3.4.6/libffi-3.4.6.tar.gz"
+            source_sha256: "b0dea9df23c863a7a50e825440f3ebffabd65df1497108e5d437747843895a4e"
+            build_type: autoconf
+
+          - package: libffi
+            os: darwin
+            arch: arm64
+            runner: macos-14
+            version: "3.4.6"
+            source_url: "https://github.com/libffi/libffi/releases/download/v3.4.6/libffi-3.4.6.tar.gz"
+            source_sha256: "b0dea9df23c863a7a50e825440f3ebffabd65df1497108e5d437747843895a4e"
+            build_type: autoconf
+
+          # ── bzip2 (plain Makefile, Linux + macOS only) ────────────────────
+          - package: bzip2
+            os: linux
+            arch: amd64
+            runner: ubuntu-22.04
+            version: "1.0.8"
+            source_url: "https://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz"
+            source_sha256: "ab5a03176ee106d3f0fa90e381da478ddae405918153cca248e682cd0c4a2269"
+            build_type: bzip2_make
+
+          - package: bzip2
+            os: linux
+            arch: arm64
+            runner: ubuntu-22.04-arm
+            version: "1.0.8"
+            source_url: "https://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz"
+            source_sha256: "ab5a03176ee106d3f0fa90e381da478ddae405918153cca248e682cd0c4a2269"
+            build_type: bzip2_make
+
+          - package: bzip2
+            os: darwin
+            arch: arm64
+            runner: macos-14
+            version: "1.0.8"
+            source_url: "https://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz"
+            source_sha256: "ab5a03176ee106d3f0fa90e381da478ddae405918153cca248e682cd0c4a2269"
+            build_type: bzip2_make
+
+          # ── LuaJIT (plain Makefile, Linux + macOS only — Windows uses a
+          #    separate msvcbuild.bat toolchain not covered here) ──────────
+          - package: luajit
+            os: linux
+            arch: amd64
+            runner: ubuntu-22.04
+            version: "2.1.0-beta3"
+            source_url: "http://luajit.org/download/LuaJIT-2.1.0-beta3.tar.gz"
+            source_sha256: "1ad2e34b111c802f9d0cdf019e986909123237a28c746b21295b63c9e785d9c3"
+            build_type: luajit_make
+
+          - package: luajit
+            os: linux
+            arch: arm64
+            runner: ubuntu-22.04-arm
+            version: "2.1.0-beta3"
+            source_url: "http://luajit.org/download/LuaJIT-2.1.0-beta3.tar.gz"
+            source_sha256: "1ad2e34b111c802f9d0cdf019e986909123237a28c746b21295b63c9e785d9c3"
+            build_type: luajit_make
+
+          - package: luajit
+            os: darwin
+            arch: arm64
+            runner: macos-14
+            version: "2.1.0-beta3"
+            source_url: "http://luajit.org/download/LuaJIT-2.1.0-beta3.tar.gz"
+            source_sha256: "1ad2e34b111c802f9d0cdf019e986909123237a28c746b21295b63c9e785d9c3"
+            build_type: luajit_make
+
+          # ── mruby (rake-based build, Linux amd64 + macOS arm64 only) ──────
+          - package: mruby
+            os: linux
+            arch: amd64
+            runner: ubuntu-22.04
+            version: "3.3.0"
+            source_url: "https://github.com/mruby/mruby/archive/refs/tags/3.3.0.tar.gz"
+            source_sha256: "53088367e3d7657eb722ddfacb938f74aed1f8538b3717fe0b6eb8f58402af65"
+            build_type: mruby_rake
+
+          - package: mruby
+            os: darwin
+            arch: arm64
+            runner: macos-14
+            version: "3.3.0"
+            source_url: "https://github.com/mruby/mruby/archive/refs/tags/3.3.0.tar.gz"
+            source_sha256: "53088367e3d7657eb722ddfacb938f74aed1f8538b3717fe0b6eb8f58402af65"
+            build_type: mruby_rake
+
+          # ── musl libc (Linux only — it's a libc replacement, not
+          #    applicable to macOS or Windows) ────────────────────────────
+          # NOTE: source_sha256 below could not be independently confirmed
+          # against a citable checksum source during authoring — verify it
+          # against musl-1.2.5.tar.gz.asc before relying on this build.
+          - package: musl
+            os: linux
+            arch: amd64
+            runner: ubuntu-22.04
+            version: "1.2.5"
+            source_url: "https://musl.libc.org/releases/musl-1.2.5.tar.gz"
+            source_sha256: "PLEASE_VERIFY_SHA256"
+            build_type: musl_configure
+
+          - package: musl
+            os: linux
+            arch: arm64
+            runner: ubuntu-22.04-arm
+            version: "1.2.5"
+            source_url: "https://musl.libc.org/releases/musl-1.2.5.tar.gz"
+            source_sha256: "PLEASE_VERIFY_SHA256"
+            build_type: musl_configure
+
     steps:
       - uses: actions/checkout@v4
 
@@ -194,12 +651,12 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends \
             build-essential cmake ninja-build pkg-config \
-            zlib1g-dev xz-utils curl zstd
+            zlib1g-dev xz-utils curl zstd bison ruby-dev
 
       - name: Install tools (macOS)
         if: runner.os == 'macOS'
         run: |
-          brew install cmake ninja zstd xz
+          brew install cmake ninja zstd xz bison
 
       - name: Install tools (Windows)
         if: runner.os == 'Windows'
@@ -290,7 +747,7 @@ jobs:
           }
           Write-Host "Source extracted."
 
-      # ── Build: autoconf (SQLite Linux/macOS) ─────────────────────────────
+      # ── Build: autoconf (SQLite Linux/macOS, ncurses, xz, libffi) ────────
       - name: Build (autoconf)
         if: matrix.build_type == 'autoconf'
         shell: bash
@@ -307,13 +764,18 @@ jobs:
           make -j$(nproc 2>/dev/null || sysctl -n hw.ncpu)
           make install
 
-      # ── Build: cmake (zlib all platforms) ────────────────────────────────
+      # ── Build: cmake (zlib, zstd, libpng, libjpeg-turbo, pcre2, expat,
+      #    c-ares, libuv, all platforms) ────────────────────────────────────
       - name: Build (cmake) Unix
         if: matrix.build_type == 'cmake' && runner.os != 'Windows'
         shell: bash
         run: |
           INSTALL_DIR="${PWD}/build/install"
-          cmake -S build/source -B build/build_dir \
+          SRC_DIR="build/source"
+          if [ -n "${{ matrix.cmake_source_subdir }}" ]; then
+            SRC_DIR="build/source/${{ matrix.cmake_source_subdir }}"
+          fi
+          cmake -S "${SRC_DIR}" -B build/build_dir \
             -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
             -DBUILD_SHARED_LIBS=ON \
             -DCMAKE_BUILD_TYPE=Release \
@@ -326,7 +788,11 @@ jobs:
         shell: pwsh
         run: |
           $INSTALL_DIR = "$PWD\build\install"
-          cmake -S build\source -B build\build_dir `
+          $SRC_DIR = "build\source"
+          if ("${{ matrix.cmake_source_subdir }}" -ne "") {
+            $SRC_DIR = "build\source\${{ matrix.cmake_source_subdir }}"
+          }
+          cmake -S $SRC_DIR -B build\build_dir `
             -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" `
             -DBUILD_SHARED_LIBS=ON `
             -DCMAKE_BUILD_TYPE=Release
@@ -388,6 +854,79 @@ jobs:
           # Build first, then install — Lua's Makefile requires this order.
           make -j${NPROC} MYCFLAGS="-fPIC" ${PLAT}
           make install INSTALL_TOP="${INSTALL_DIR}"
+
+      # ── Build: bzip2 (plain Makefile, Linux/macOS) ────────────────────────
+      - name: Build bzip2 (make)
+        if: matrix.build_type == 'bzip2_make'
+        shell: bash
+        run: |
+          INSTALL_DIR="${PWD}/build/install"
+          mkdir -p "${INSTALL_DIR}"
+          cd build/source
+
+          NPROC=$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4)
+
+          # bzip2's Makefile predates -fPIC defaults; build the shared lib
+          # target explicitly in addition to the static lib + CLI.
+          sed -i.bak 's/^CFLAGS=\(.*\)$/CFLAGS=\1 -fPIC/' Makefile Makefile-libbz2_so || true
+          make -j${NPROC}
+          make -f Makefile-libbz2_so -j${NPROC} || true
+          make install PREFIX="${INSTALL_DIR}"
+          cp -f libbz2.so* "${INSTALL_DIR}/lib/" 2>/dev/null || true
+
+      # ── Build: LuaJIT (plain Makefile, Linux/macOS) ───────────────────────
+      - name: Build LuaJIT (make)
+        if: matrix.build_type == 'luajit_make'
+        shell: bash
+        run: |
+          INSTALL_DIR="${PWD}/build/install"
+          mkdir -p "${INSTALL_DIR}"
+          cd build/source
+
+          NPROC=$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4)
+
+          make -j${NPROC} PREFIX="${INSTALL_DIR}"
+          make install PREFIX="${INSTALL_DIR}"
+          echo "LuaJIT version: $("${INSTALL_DIR}/bin/luajit" -v)"
+
+      # ── Build: mruby (rake, Linux amd64 + macOS arm64) ────────────────────
+      - name: Build mruby (rake)
+        if: matrix.build_type == 'mruby_rake'
+        shell: bash
+        run: |
+          INSTALL_DIR="${PWD}/build/install"
+          mkdir -p "${INSTALL_DIR}"
+          cd build/source
+
+          cp build_config/default.rb homebrew.rb
+          sed -i.bak "s/conf.gembox 'default'/conf.gembox 'full-core'/" homebrew.rb || \
+            sed -i '' "s/conf.gembox 'default'/conf.gembox 'full-core'/" homebrew.rb
+
+          MRUBY_CONFIG="${PWD}/homebrew.rb" rake
+
+          mkdir -p "${INSTALL_DIR}/lib" "${INSTALL_DIR}/bin" "${INSTALL_DIR}/include"
+          cp -f build/host/lib/*.a "${INSTALL_DIR}/lib/"
+          cp -rf build/host/bin/* "${INSTALL_DIR}/bin/"
+          cp -rf include/* "${INSTALL_DIR}/include/"
+          echo "mruby build complete."
+
+      # ── Build: musl libc (configure + make, Linux only) ───────────────────
+      - name: Build musl (configure)
+        if: matrix.build_type == 'musl_configure'
+        shell: bash
+        run: |
+          INSTALL_DIR="${PWD}/build/install"
+          mkdir -p "${INSTALL_DIR}"
+          cd build/source
+
+          NPROC=$(nproc 2>/dev/null || echo 4)
+
+          ./configure \
+            --prefix="${INSTALL_DIR}" \
+            --syslibdir="${INSTALL_DIR}/lib"
+          make -j${NPROC}
+          make install
+          echo "musl built for ${{ matrix.arch }}."
 
       # ── Build: Zig (prebuilt repackage) ──────────────────────────────────
       - name: Repackage Zig (Unix)
