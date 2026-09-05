@@ -68,16 +68,6 @@ jobs:
             source_sha256: "67d3fe6d268e6eaddcae3727fce58fcc8e9c53869bdd07a0c61e38ddf2965071"
             build_type: autoconf
 
-          # ── SQLite (macOS amd64) ───────────────────────────────────────────
-          - package: sqlite
-            os: darwin
-            arch: amd64
-            runner: macos-13
-            version: "3.46.1"
-            source_url: "https://www.sqlite.org/2024/sqlite-autoconf-3460100.tar.gz"
-            source_sha256: "67d3fe6d268e6eaddcae3727fce58fcc8e9c53869bdd07a0c61e38ddf2965071"
-            build_type: autoconf
-
           # ── SQLite (macOS arm64) ───────────────────────────────────────────
           - package: sqlite
             os: darwin
@@ -191,7 +181,6 @@ jobs:
             runner: windows-2022
             version: "0.13.0"
             source_url: "https://ziglang.org/download/0.13.0/zig-windows-x86_64-0.13.0.zip"
-            # From ziglang.org/download/index.json
             source_sha256: "d859994725ef9402381e557c60bb57497215682e355204d754ee3df75ee3c158"
             build_type: zig_prebuilt
 
