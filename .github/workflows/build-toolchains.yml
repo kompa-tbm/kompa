@@ -14,6 +14,20 @@ on:
 permissions:
   contents: write
 
+# ─────────────────────────────────────────────────────────────────────────────
+# build_type legend
+#   autoconf          – ./configure && make && make install  (no extra flags)
+#   autoconf_flags    – autoconf with custom configure_flags from matrix
+#   cmake             – cmake -S … -B … && cmake --build && cmake --install
+#   cmake_win         – cmake only on Windows (package uses cmake everywhere)
+#   lua_make          – Lua's platform-flavoured make
+#   zig_prebuilt      – unpack the official Zig prebuilt tarball/zip
+#   git_cmake         – clone from git and build with cmake (no tarball hash)
+#   git_make          – clone from git and build with make
+#   git_autoconf      – clone from git and build with autoconf
+#   musl_only         – Linux-only autoconf build (musl libc cross-tool)
+# ─────────────────────────────────────────────────────────────────────────────
+
 jobs:
   # ── Determine next sequential release tag ─────────────────────────────────
   next-tag:
@@ -48,625 +62,178 @@ jobs:
       matrix:
         include:
 
-          # ── SQLite (Linux amd64) ───────────────────────────────────────────
-          - package: sqlite
-            os: linux
-            arch: amd64
-            runner: ubuntu-22.04
-            version: "3.46.1"
-            source_url: "https://www.sqlite.org/2024/sqlite-autoconf-3460100.tar.gz"
-            source_sha256: "67d3fe6d268e6eaddcae3727fce58fcc8e9c53869bdd07a0c61e38ddf2965071"
-            build_type: autoconf
-
-          # ── SQLite (Linux arm64) ───────────────────────────────────────────
-          - package: sqlite
-            os: linux
-            arch: arm64
-            runner: ubuntu-22.04-arm
-            version: "3.46.1"
-            source_url: "https://www.sqlite.org/2024/sqlite-autoconf-3460100.tar.gz"
-            source_sha256: "67d3fe6d268e6eaddcae3727fce58fcc8e9c53869bdd07a0c61e38ddf2965071"
-            build_type: autoconf
-
-          # ── SQLite (macOS arm64) ───────────────────────────────────────────
-          - package: sqlite
-            os: darwin
-            arch: arm64
-            runner: macos-14
-            version: "3.46.1"
-            source_url: "https://www.sqlite.org/2024/sqlite-autoconf-3460100.tar.gz"
-            source_sha256: "67d3fe6d268e6eaddcae3727fce58fcc8e9c53869bdd07a0c61e38ddf2965071"
-            build_type: autoconf
-
-          # ── SQLite (Windows amd64) — cmake amalgamation ──────────────────
-          - package: sqlite
-            os: windows
-            arch: amd64
-            runner: windows-2022
-            version: "3.46.1"
-            # SQLite's download page lists SHA3-256, not SHA-256, so we leave
-            # source_sha256 empty and rely on HTTPS for transport integrity.
-            source_url: "https://www.sqlite.org/2024/sqlite-amalgamation-3460100.zip"
-            source_sha256: ""
-            build_type: cmake_amalgamation
-
-          # ── zlib (Linux amd64) ────────────────────────────────────────────
-          - package: zlib
-            os: linux
-            arch: amd64
-            runner: ubuntu-22.04
-            version: "1.3.1"
-            source_url: "https://github.com/madler/zlib/releases/download/v1.3.1/zlib-1.3.1.tar.gz"
-            source_sha256: "9a93b2b7dfdac77ceba5a558a580e74667dd6fede4585b91eefb60f03b72df23"
-            build_type: cmake
-
-          # ── zlib (macOS arm64) ────────────────────────────────────────────
-          - package: zlib
-            os: darwin
-            arch: arm64
-            runner: macos-14
-            version: "1.3.1"
-            source_url: "https://github.com/madler/zlib/releases/download/v1.3.1/zlib-1.3.1.tar.gz"
-            source_sha256: "9a93b2b7dfdac77ceba5a558a580e74667dd6fede4585b91eefb60f03b72df23"
-            build_type: cmake
-
-          # ── zlib (Windows amd64) ─────────────────────────────────────────
-          - package: zlib
-            os: windows
-            arch: amd64
-            runner: windows-2022
-            version: "1.3.1"
-            source_url: "https://github.com/madler/zlib/releases/download/v1.3.1/zlib-1.3.1.tar.gz"
-            source_sha256: "9a93b2b7dfdac77ceba5a558a580e74667dd6fede4585b91eefb60f03b72df23"
-            build_type: cmake
-
-          # ── Lua (Linux amd64) ─────────────────────────────────────────────
-          - package: lua
-            os: linux
-            arch: amd64
-            runner: ubuntu-22.04
-            version: "5.4.7"
-            source_url: "https://www.lua.org/ftp/lua-5.4.7.tar.gz"
-            source_sha256: "9fbf5e28ef86c69858f6d3d34eccc32e911c1a28b4120ff3e84aaa70cfbf1e30"
-            build_type: lua_make
-
-          # ── Lua (macOS arm64) ─────────────────────────────────────────────
-          - package: lua
-            os: darwin
-            arch: arm64
-            runner: macos-14
-            version: "5.4.7"
-            source_url: "https://www.lua.org/ftp/lua-5.4.7.tar.gz"
-            source_sha256: "9fbf5e28ef86c69858f6d3d34eccc32e911c1a28b4120ff3e84aaa70cfbf1e30"
-            build_type: lua_make
-
-          # ── Zig 0.13.0 prebuilt (Linux amd64) ────────────────────────────
-          - package: zig
-            os: linux
-            arch: amd64
-            runner: ubuntu-22.04
-            version: "0.13.0"
-            source_url: "https://ziglang.org/download/0.13.0/zig-linux-x86_64-0.13.0.tar.xz"
-            # Fetched from https://ziglang.org/download/0.13.0/zig-0.13.0-release-notes.html
-            source_sha256: "d45312e61ebcc48032b77bc4cf7fd6915c11fa16e4aad116b66c9468211230ea"
-            build_type: zig_prebuilt
-
-          # ── Zig 0.13.0 prebuilt (Linux arm64) ────────────────────────────
-          - package: zig
-            os: linux
-            arch: arm64
-            runner: ubuntu-22.04-arm
-            version: "0.13.0"
-            source_url: "https://ziglang.org/download/0.13.0/zig-linux-aarch64-0.13.0.tar.xz"
-            # From ziglang.org/download/index.json
-            source_sha256: "041ac42323837eb5624068acd8b00cd5777dac4cf91179e8dad7a7e90dd0c556"
-            build_type: zig_prebuilt
-
-          # ── Zig 0.13.0 prebuilt (macOS arm64) ────────────────────────────
-          - package: zig
-            os: darwin
-            arch: arm64
-            runner: macos-14
-            version: "0.13.0"
-            # Note: 0.13.0 uses zig-macos-aarch64 naming (not zig-aarch64-macos)
-            source_url: "https://ziglang.org/download/0.13.0/zig-macos-aarch64-0.13.0.tar.xz"
-            # From ziglang.org/download/index.json
-            source_sha256: "46fae219656545dfaf4dce12fb4e8685cec5b51d721beee9389ab4194d43394c"
-            build_type: zig_prebuilt
-
-          # ── Zig 0.13.0 prebuilt (Windows amd64) ──────────────────────────
-          - package: zig
-            os: windows
-            arch: amd64
-            runner: windows-2022
-            version: "0.13.0"
-            source_url: "https://ziglang.org/download/0.13.0/zig-windows-x86_64-0.13.0.zip"
-            source_sha256: "d859994725ef9402381e557c60bb57497215682e355204d754ee3df75ee3c158"
-            build_type: zig_prebuilt
-
           # ══════════════════════════════════════════════════════════════════
-          # New packages below this line
+          # EXISTING PACKAGES (kept intact)
           # ══════════════════════════════════════════════════════════════════
 
-          # ── zstd (cmake, all 4 platforms) ─────────────────────────────────
-          - package: zstd
-            os: linux
-            arch: amd64
-            runner: ubuntu-22.04
-            version: "1.5.6"
-            source_url: "https://github.com/facebook/zstd/archive/refs/tags/v1.5.6.tar.gz"
-            source_sha256: "30f35f71c1203369dc979ecde0400ffea93c27391bfd2ac5a9715d2173d92ff7"
-            build_type: cmake
-            cmake_source_subdir: "build/cmake"
+          # ── SQLite ────────────────────────────────────────────────────────
+          - {package: sqlite, os: linux,   arch: amd64, runner: ubuntu-22.04,     version: "3.46.1", build_type: autoconf, source_url: "https://www.sqlite.org/2024/sqlite-autoconf-3460100.tar.gz",           source_sha256: "67d3fe6d268e6eaddcae3727fce58fcc8e9c53869bdd07a0c61e38ddf2965071"}
+          - {package: sqlite, os: linux,   arch: arm64, runner: ubuntu-22.04-arm, version: "3.46.1", build_type: autoconf, source_url: "https://www.sqlite.org/2024/sqlite-autoconf-3460100.tar.gz",           source_sha256: "67d3fe6d268e6eaddcae3727fce58fcc8e9c53869bdd07a0c61e38ddf2965071"}
+          - {package: sqlite, os: darwin,  arch: arm64, runner: macos-14,          version: "3.46.1", build_type: autoconf, source_url: "https://www.sqlite.org/2024/sqlite-autoconf-3460100.tar.gz",           source_sha256: "67d3fe6d268e6eaddcae3727fce58fcc8e9c53869bdd07a0c61e38ddf2965071"}
+          - {package: sqlite, os: windows, arch: amd64, runner: windows-2022,      version: "3.46.1", build_type: cmake_amalgamation, source_url: "https://www.sqlite.org/2024/sqlite-amalgamation-3460100.zip", source_sha256: ""}
 
-          - package: zstd
-            os: linux
-            arch: arm64
-            runner: ubuntu-22.04-arm
-            version: "1.5.6"
-            source_url: "https://github.com/facebook/zstd/archive/refs/tags/v1.5.6.tar.gz"
-            source_sha256: "30f35f71c1203369dc979ecde0400ffea93c27391bfd2ac5a9715d2173d92ff7"
-            build_type: cmake
-            cmake_source_subdir: "build/cmake"
+          # ── zlib ──────────────────────────────────────────────────────────
+          - {package: zlib, os: linux,   arch: amd64, runner: ubuntu-22.04,     version: "1.3.1", build_type: cmake, source_url: "https://github.com/madler/zlib/releases/download/v1.3.1/zlib-1.3.1.tar.gz", source_sha256: "9a93b2b7dfdac77ceba5a558a580e74667dd6fede4585b91eefb60f03b72df23"}
+          - {package: zlib, os: darwin,  arch: arm64, runner: macos-14,          version: "1.3.1", build_type: cmake, source_url: "https://github.com/madler/zlib/releases/download/v1.3.1/zlib-1.3.1.tar.gz", source_sha256: "9a93b2b7dfdac77ceba5a558a580e74667dd6fede4585b91eefb60f03b72df23"}
+          - {package: zlib, os: windows, arch: amd64, runner: windows-2022,      version: "1.3.1", build_type: cmake, source_url: "https://github.com/madler/zlib/releases/download/v1.3.1/zlib-1.3.1.tar.gz", source_sha256: "9a93b2b7dfdac77ceba5a558a580e74667dd6fede4585b91eefb60f03b72df23"}
 
-          - package: zstd
-            os: darwin
-            arch: arm64
-            runner: macos-14
-            version: "1.5.6"
-            source_url: "https://github.com/facebook/zstd/archive/refs/tags/v1.5.6.tar.gz"
-            source_sha256: "30f35f71c1203369dc979ecde0400ffea93c27391bfd2ac5a9715d2173d92ff7"
-            build_type: cmake
-            cmake_source_subdir: "build/cmake"
+          # ── Lua ───────────────────────────────────────────────────────────
+          - {package: lua, os: linux,  arch: amd64, runner: ubuntu-22.04, version: "5.4.7", build_type: lua_make, source_url: "https://www.lua.org/ftp/lua-5.4.7.tar.gz", source_sha256: "9fbf5e28ef86c69858f6d3d34eccc32e911c1a28b4120ff3e84aaa70cfbf1e30"}
+          - {package: lua, os: darwin, arch: arm64, runner: macos-14,      version: "5.4.7", build_type: lua_make, source_url: "https://www.lua.org/ftp/lua-5.4.7.tar.gz", source_sha256: "9fbf5e28ef86c69858f6d3d34eccc32e911c1a28b4120ff3e84aaa70cfbf1e30"}
 
-          - package: zstd
-            os: windows
-            arch: amd64
-            runner: windows-2022
-            version: "1.5.6"
-            source_url: "https://github.com/facebook/zstd/archive/refs/tags/v1.5.6.tar.gz"
-            source_sha256: "30f35f71c1203369dc979ecde0400ffea93c27391bfd2ac5a9715d2173d92ff7"
-            build_type: cmake
-            cmake_source_subdir: "build/cmake"
+          # ── Zig ───────────────────────────────────────────────────────────
+          - {package: zig, os: linux,   arch: amd64, runner: ubuntu-22.04,     version: "0.13.0", build_type: zig_prebuilt, source_url: "https://ziglang.org/download/0.13.0/zig-linux-x86_64-0.13.0.tar.xz",      source_sha256: "d45312e61ebcc48032b77bc4cf7fd6915c11fa16e4aad116b66c9468211230ea"}
+          - {package: zig, os: linux,   arch: arm64, runner: ubuntu-22.04-arm, version: "0.13.0", build_type: zig_prebuilt, source_url: "https://ziglang.org/download/0.13.0/zig-linux-aarch64-0.13.0.tar.xz",   source_sha256: "041ac42323837eb5624068acd8b00cd5777dac4cf91179e8dad7a7e90dd0c556"}
+          - {package: zig, os: darwin,  arch: arm64, runner: macos-14,          version: "0.13.0", build_type: zig_prebuilt, source_url: "https://ziglang.org/download/0.13.0/zig-macos-aarch64-0.13.0.tar.xz",   source_sha256: "46fae219656545dfaf4dce12fb4e8685cec5b51d721beee9389ab4194d43394c"}
+          - {package: zig, os: windows, arch: amd64, runner: windows-2022,      version: "0.13.0", build_type: zig_prebuilt, source_url: "https://ziglang.org/download/0.13.0/zig-windows-x86_64-0.13.0.zip",     source_sha256: "d859994725ef9402381e557c60bb57497215682e355204d754ee3df75ee3c158"}
 
-          # ── libpng (cmake, all 4 platforms) ───────────────────────────────
-          - package: libpng
-            os: linux
-            arch: amd64
-            runner: ubuntu-22.04
-            version: "1.6.58"
-            source_url: "https://downloads.sourceforge.net/project/libpng/libpng16/1.6.58/libpng-1.6.58.tar.xz"
-            source_sha256: "28eb403f51f0f7405249132cecfe82ea5c0ef97f1b32c5a65828814ae0d34775"
-            build_type: cmake
+          # ══════════════════════════════════════════════════════════════════
+          # NEW PACKAGES — cmake build
+          # ══════════════════════════════════════════════════════════════════
 
-          - package: libpng
-            os: linux
-            arch: arm64
-            runner: ubuntu-22.04-arm
-            version: "1.6.58"
-            source_url: "https://downloads.sourceforge.net/project/libpng/libpng16/1.6.58/libpng-1.6.58.tar.xz"
-            source_sha256: "28eb403f51f0f7405249132cecfe82ea5c0ef97f1b32c5a65828814ae0d34775"
-            build_type: cmake
+          # ── zstd 1.5.7 ────────────────────────────────────────────────────
+          - {package: zstd, os: linux,   arch: amd64, runner: ubuntu-22.04,     version: "1.5.7", build_type: cmake, configure_flags: "-DZSTD_BUILD_SHARED=ON -DZSTD_BUILD_STATIC=ON -DZSTD_BUILD_PROGRAMS=ON", source_url: "https://github.com/facebook/zstd/releases/download/v1.5.7/zstd-1.5.7.tar.gz",   source_sha256: "eb33e51f49a15e023950cd7825ca74a4a2b43db8354825ac24fc1b7ee09e6fa3"}
+          - {package: zstd, os: linux,   arch: arm64, runner: ubuntu-22.04-arm, version: "1.5.7", build_type: cmake, configure_flags: "-DZSTD_BUILD_SHARED=ON -DZSTD_BUILD_STATIC=ON -DZSTD_BUILD_PROGRAMS=ON", source_url: "https://github.com/facebook/zstd/releases/download/v1.5.7/zstd-1.5.7.tar.gz",   source_sha256: "eb33e51f49a15e023950cd7825ca74a4a2b43db8354825ac24fc1b7ee09e6fa3"}
+          - {package: zstd, os: darwin,  arch: arm64, runner: macos-14,          version: "1.5.7", build_type: cmake, configure_flags: "-DZSTD_BUILD_SHARED=ON -DZSTD_BUILD_STATIC=ON -DZSTD_BUILD_PROGRAMS=ON", source_url: "https://github.com/facebook/zstd/releases/download/v1.5.7/zstd-1.5.7.tar.gz",   source_sha256: "eb33e51f49a15e023950cd7825ca74a4a2b43db8354825ac24fc1b7ee09e6fa3"}
+          - {package: zstd, os: windows, arch: amd64, runner: windows-2022,      version: "1.5.7", build_type: cmake, configure_flags: "-DZSTD_BUILD_SHARED=ON -DZSTD_BUILD_STATIC=ON -DZSTD_BUILD_PROGRAMS=ON", source_url: "https://github.com/facebook/zstd/releases/download/v1.5.7/zstd-1.5.7.tar.gz",   source_sha256: "eb33e51f49a15e023950cd7825ca74a4a2b43db8354825ac24fc1b7ee09e6fa3", cmake_source_subdir: "build/cmake"}
 
-          - package: libpng
-            os: darwin
-            arch: arm64
-            runner: macos-14
-            version: "1.6.58"
-            source_url: "https://downloads.sourceforge.net/project/libpng/libpng16/1.6.58/libpng-1.6.58.tar.xz"
-            source_sha256: "28eb403f51f0f7405249132cecfe82ea5c0ef97f1b32c5a65828814ae0d34775"
-            build_type: cmake
+          # ── libpng 1.6.58 ─────────────────────────────────────────────────
+          - {package: libpng, os: linux,   arch: amd64, runner: ubuntu-22.04,     version: "1.6.58", build_type: cmake, configure_flags: "-DPNG_SHARED=ON -DPNG_STATIC=ON", source_url: "https://sourceforge.net/projects/libpng/files/libpng16/1.6.58/libpng-1.6.58.tar.gz", source_sha256: "8c9b05b675ca7301a458df2c2e46f26e1d41ff36b8863f8c33530bc58c2e6225"}
+          - {package: libpng, os: linux,   arch: arm64, runner: ubuntu-22.04-arm, version: "1.6.58", build_type: cmake, configure_flags: "-DPNG_SHARED=ON -DPNG_STATIC=ON", source_url: "https://sourceforge.net/projects/libpng/files/libpng16/1.6.58/libpng-1.6.58.tar.gz", source_sha256: "8c9b05b675ca7301a458df2c2e46f26e1d41ff36b8863f8c33530bc58c2e6225"}
+          - {package: libpng, os: darwin,  arch: arm64, runner: macos-14,          version: "1.6.58", build_type: cmake, configure_flags: "-DPNG_SHARED=ON -DPNG_STATIC=ON", source_url: "https://sourceforge.net/projects/libpng/files/libpng16/1.6.58/libpng-1.6.58.tar.gz", source_sha256: "8c9b05b675ca7301a458df2c2e46f26e1d41ff36b8863f8c33530bc58c2e6225"}
+          - {package: libpng, os: windows, arch: amd64, runner: windows-2022,      version: "1.6.58", build_type: cmake, configure_flags: "-DPNG_SHARED=ON -DPNG_STATIC=ON", source_url: "https://sourceforge.net/projects/libpng/files/libpng16/1.6.58/libpng-1.6.58.tar.gz", source_sha256: "8c9b05b675ca7301a458df2c2e46f26e1d41ff36b8863f8c33530bc58c2e6225"}
 
-          - package: libpng
-            os: windows
-            arch: amd64
-            runner: windows-2022
-            version: "1.6.58"
-            source_url: "https://downloads.sourceforge.net/project/libpng/libpng16/1.6.58/libpng-1.6.58.tar.xz"
-            source_sha256: "28eb403f51f0f7405249132cecfe82ea5c0ef97f1b32c5a65828814ae0d34775"
-            build_type: cmake
+          # ── libjpeg-turbo 3.0.3 ───────────────────────────────────────────
+          - {package: libjpeg-turbo, os: linux,   arch: amd64, runner: ubuntu-22.04,     version: "3.0.3", build_type: cmake, configure_flags: "", source_url: "https://github.com/libjpeg-turbo/libjpeg-turbo/releases/download/3.0.3/libjpeg-turbo-3.0.3.tar.gz", source_sha256: "343e789069fc7afbcdfe44dbba7dbbf45afa98a15150e079a38e60e44578865d"}
+          - {package: libjpeg-turbo, os: linux,   arch: arm64, runner: ubuntu-22.04-arm, version: "3.0.3", build_type: cmake, configure_flags: "", source_url: "https://github.com/libjpeg-turbo/libjpeg-turbo/releases/download/3.0.3/libjpeg-turbo-3.0.3.tar.gz", source_sha256: "343e789069fc7afbcdfe44dbba7dbbf45afa98a15150e079a38e60e44578865d"}
+          - {package: libjpeg-turbo, os: darwin,  arch: arm64, runner: macos-14,          version: "3.0.3", build_type: cmake, configure_flags: "", source_url: "https://github.com/libjpeg-turbo/libjpeg-turbo/releases/download/3.0.3/libjpeg-turbo-3.0.3.tar.gz", source_sha256: "343e789069fc7afbcdfe44dbba7dbbf45afa98a15150e079a38e60e44578865d"}
+          - {package: libjpeg-turbo, os: windows, arch: amd64, runner: windows-2022,      version: "3.0.3", build_type: cmake, configure_flags: "", source_url: "https://github.com/libjpeg-turbo/libjpeg-turbo/releases/download/3.0.3/libjpeg-turbo-3.0.3.tar.gz", source_sha256: "343e789069fc7afbcdfe44dbba7dbbf45afa98a15150e079a38e60e44578865d"}
 
-          # ── libjpeg-turbo (cmake, all 4 platforms) ────────────────────────
-          - package: libjpeg-turbo
-            os: linux
-            arch: amd64
-            runner: ubuntu-22.04
-            version: "3.1.3"
-            source_url: "https://github.com/libjpeg-turbo/libjpeg-turbo/releases/download/3.1.3/libjpeg-turbo-3.1.3.tar.gz"
-            source_sha256: "075920b826834ac4ddf97661cc73491047855859affd671d52079c6867c1c6c0"
-            build_type: cmake
+          # ── libffi 3.4.6 ──────────────────────────────────────────────────
+          - {package: libffi, os: linux,  arch: amd64, runner: ubuntu-22.04,     version: "3.4.6", build_type: autoconf, configure_flags: "--enable-shared --enable-static", source_url: "https://github.com/libffi/libffi/releases/download/v3.4.6/libffi-3.4.6.tar.gz", source_sha256: "b0dea9df23c863a7a50e825440f3ebffabd65df1497108e5d437747843895a4e"}
+          - {package: libffi, os: linux,  arch: arm64, runner: ubuntu-22.04-arm, version: "3.4.6", build_type: autoconf, configure_flags: "--enable-shared --enable-static", source_url: "https://github.com/libffi/libffi/releases/download/v3.4.6/libffi-3.4.6.tar.gz", source_sha256: "b0dea9df23c863a7a50e825440f3ebffabd65df1497108e5d437747843895a4e"}
+          - {package: libffi, os: darwin, arch: arm64, runner: macos-14,          version: "3.4.6", build_type: autoconf, configure_flags: "--enable-shared --enable-static", source_url: "https://github.com/libffi/libffi/releases/download/v3.4.6/libffi-3.4.6.tar.gz", source_sha256: "b0dea9df23c863a7a50e825440f3ebffabd65df1497108e5d437747843895a4e"}
 
-          - package: libjpeg-turbo
-            os: linux
-            arch: arm64
-            runner: ubuntu-22.04-arm
-            version: "3.1.3"
-            source_url: "https://github.com/libjpeg-turbo/libjpeg-turbo/releases/download/3.1.3/libjpeg-turbo-3.1.3.tar.gz"
-            source_sha256: "075920b826834ac4ddf97661cc73491047855859affd671d52079c6867c1c6c0"
-            build_type: cmake
+          # ── expat 2.8.3 ───────────────────────────────────────────────────
+          - {package: expat, os: linux,   arch: amd64, runner: ubuntu-22.04,     version: "2.8.3", build_type: cmake, configure_flags: "-DEXPAT_BUILD_EXAMPLES=OFF -DEXPAT_BUILD_TESTS=OFF", source_url: "https://github.com/libexpat/libexpat/releases/download/R_2_8_3/expat-2.8.3.tar.xz", source_sha256: "f6256df90c906773d344da084402b7d3e4f22ed41b1a59c989098a83d3ea0c85"}
+          - {package: expat, os: linux,   arch: arm64, runner: ubuntu-22.04-arm, version: "2.8.3", build_type: cmake, configure_flags: "-DEXPAT_BUILD_EXAMPLES=OFF -DEXPAT_BUILD_TESTS=OFF", source_url: "https://github.com/libexpat/libexpat/releases/download/R_2_8_3/expat-2.8.3.tar.xz", source_sha256: "f6256df90c906773d344da084402b7d3e4f22ed41b1a59c989098a83d3ea0c85"}
+          - {package: expat, os: darwin,  arch: arm64, runner: macos-14,          version: "2.8.3", build_type: cmake, configure_flags: "-DEXPAT_BUILD_EXAMPLES=OFF -DEXPAT_BUILD_TESTS=OFF", source_url: "https://github.com/libexpat/libexpat/releases/download/R_2_8_3/expat-2.8.3.tar.xz", source_sha256: "f6256df90c906773d344da084402b7d3e4f22ed41b1a59c989098a83d3ea0c85"}
+          - {package: expat, os: windows, arch: amd64, runner: windows-2022,      version: "2.8.3", build_type: cmake, configure_flags: "-DEXPAT_BUILD_EXAMPLES=OFF -DEXPAT_BUILD_TESTS=OFF", source_url: "https://github.com/libexpat/libexpat/releases/download/R_2_8_3/expat-2.8.3.tar.xz", source_sha256: "f6256df90c906773d344da084402b7d3e4f22ed41b1a59c989098a83d3ea0c85"}
 
-          - package: libjpeg-turbo
-            os: darwin
-            arch: arm64
-            runner: macos-14
-            version: "3.1.3"
-            source_url: "https://github.com/libjpeg-turbo/libjpeg-turbo/releases/download/3.1.3/libjpeg-turbo-3.1.3.tar.gz"
-            source_sha256: "075920b826834ac4ddf97661cc73491047855859affd671d52079c6867c1c6c0"
-            build_type: cmake
+          # ── c-ares 1.33.1 ─────────────────────────────────────────────────
+          - {package: c-ares, os: linux,   arch: amd64, runner: ubuntu-22.04,     version: "1.33.1", build_type: cmake, configure_flags: "-DCARES_SHARED=ON -DCARES_STATIC=ON -DCARES_BUILD_TOOLS=ON", source_url: "https://github.com/c-ares/c-ares/releases/download/v1.33.1/c-ares-1.33.1.tar.gz", source_sha256: "0a72be66959955c43e2af2fbd03418e82a2bd5464604ec9a62147e37aceb420b"}
+          - {package: c-ares, os: linux,   arch: arm64, runner: ubuntu-22.04-arm, version: "1.33.1", build_type: cmake, configure_flags: "-DCARES_SHARED=ON -DCARES_STATIC=ON -DCARES_BUILD_TOOLS=ON", source_url: "https://github.com/c-ares/c-ares/releases/download/v1.33.1/c-ares-1.33.1.tar.gz", source_sha256: "0a72be66959955c43e2af2fbd03418e82a2bd5464604ec9a62147e37aceb420b"}
+          - {package: c-ares, os: darwin,  arch: arm64, runner: macos-14,          version: "1.33.1", build_type: cmake, configure_flags: "-DCARES_SHARED=ON -DCARES_STATIC=ON -DCARES_BUILD_TOOLS=ON", source_url: "https://github.com/c-ares/c-ares/releases/download/v1.33.1/c-ares-1.33.1.tar.gz", source_sha256: "0a72be66959955c43e2af2fbd03418e82a2bd5464604ec9a62147e37aceb420b"}
+          - {package: c-ares, os: windows, arch: amd64, runner: windows-2022,      version: "1.33.1", build_type: cmake, configure_flags: "-DCARES_SHARED=ON -DCARES_STATIC=ON -DCARES_BUILD_TOOLS=ON", source_url: "https://github.com/c-ares/c-ares/releases/download/v1.33.1/c-ares-1.33.1.tar.gz", source_sha256: "0a72be66959955c43e2af2fbd03418e82a2bd5464604ec9a62147e37aceb420b"}
 
-          - package: libjpeg-turbo
-            os: windows
-            arch: amd64
-            runner: windows-2022
-            version: "3.1.3"
-            source_url: "https://github.com/libjpeg-turbo/libjpeg-turbo/releases/download/3.1.3/libjpeg-turbo-3.1.3.tar.gz"
-            source_sha256: "075920b826834ac4ddf97661cc73491047855859affd671d52079c6867c1c6c0"
-            build_type: cmake
+          # ── libuv 1.49.2 ─────────────────────────────────────────────────
+          # No tarball SHA256 published; verify via HTTPS from dist.libuv.org
+          - {package: libuv, os: linux,   arch: amd64, runner: ubuntu-22.04,     version: "1.49.2", build_type: cmake, configure_flags: "-DLIBUV_BUILD_SHARED=ON", source_url: "https://dist.libuv.org/dist/v1.49.2/libuv-v1.49.2.tar.gz", source_sha256: ""}
+          - {package: libuv, os: linux,   arch: arm64, runner: ubuntu-22.04-arm, version: "1.49.2", build_type: cmake, configure_flags: "-DLIBUV_BUILD_SHARED=ON", source_url: "https://dist.libuv.org/dist/v1.49.2/libuv-v1.49.2.tar.gz", source_sha256: ""}
+          - {package: libuv, os: darwin,  arch: arm64, runner: macos-14,          version: "1.49.2", build_type: cmake, configure_flags: "-DLIBUV_BUILD_SHARED=ON", source_url: "https://dist.libuv.org/dist/v1.49.2/libuv-v1.49.2.tar.gz", source_sha256: ""}
+          - {package: libuv, os: windows, arch: amd64, runner: windows-2022,      version: "1.49.2", build_type: cmake, configure_flags: "-DLIBUV_BUILD_SHARED=ON", source_url: "https://dist.libuv.org/dist/v1.49.2/libuv-v1.49.2.tar.gz", source_sha256: ""}
 
-          # ── pcre2 (cmake, all 4 platforms) ────────────────────────────────
-          - package: pcre2
-            os: linux
-            arch: amd64
-            runner: ubuntu-22.04
-            version: "10.47"
-            source_url: "https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.47/pcre2-10.47.tar.bz2"
-            source_sha256: "47fe8c99461250d42f89e6e8fdaeba9da057855d06eb7fc08d9ca03fd08d7bc7"
-            build_type: cmake
+          # ── PCRE2 10.48 ───────────────────────────────────────────────────
+          - {package: pcre2, os: linux,   arch: amd64, runner: ubuntu-22.04,     version: "10.48", build_type: cmake, configure_flags: "-DPCRE2_BUILD_PCRE2_8=ON -DPCRE2_BUILD_PCRE2_16=ON -DPCRE2_BUILD_PCRE2_32=ON -DPCRE2_SUPPORT_JIT=ON -DBUILD_SHARED_LIBS=ON", source_url: "https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.48/pcre2-10.48.tar.bz2", source_sha256: "b6c68fdf6f3ac31388b50aa89ff0fc49c00c987c16e7b5146491d12003f2c8ed"}
+          - {package: pcre2, os: linux,   arch: arm64, runner: ubuntu-22.04-arm, version: "10.48", build_type: cmake, configure_flags: "-DPCRE2_BUILD_PCRE2_8=ON -DPCRE2_BUILD_PCRE2_16=ON -DPCRE2_BUILD_PCRE2_32=ON -DPCRE2_SUPPORT_JIT=ON -DBUILD_SHARED_LIBS=ON", source_url: "https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.48/pcre2-10.48.tar.bz2", source_sha256: "b6c68fdf6f3ac31388b50aa89ff0fc49c00c987c16e7b5146491d12003f2c8ed"}
+          - {package: pcre2, os: darwin,  arch: arm64, runner: macos-14,          version: "10.48", build_type: cmake, configure_flags: "-DPCRE2_BUILD_PCRE2_8=ON -DPCRE2_BUILD_PCRE2_16=ON -DPCRE2_BUILD_PCRE2_32=ON -DPCRE2_SUPPORT_JIT=ON -DBUILD_SHARED_LIBS=ON", source_url: "https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.48/pcre2-10.48.tar.bz2", source_sha256: "b6c68fdf6f3ac31388b50aa89ff0fc49c00c987c16e7b5146491d12003f2c8ed"}
+          - {package: pcre2, os: windows, arch: amd64, runner: windows-2022,      version: "10.48", build_type: cmake, configure_flags: "-DPCRE2_BUILD_PCRE2_8=ON -DPCRE2_BUILD_PCRE2_16=ON -DPCRE2_BUILD_PCRE2_32=ON -DBUILD_SHARED_LIBS=ON", source_url: "https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.48/pcre2-10.48.tar.bz2", source_sha256: "b6c68fdf6f3ac31388b50aa89ff0fc49c00c987c16e7b5146491d12003f2c8ed"}
 
-          - package: pcre2
-            os: linux
-            arch: arm64
-            runner: ubuntu-22.04-arm
-            version: "10.47"
-            source_url: "https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.47/pcre2-10.47.tar.bz2"
-            source_sha256: "47fe8c99461250d42f89e6e8fdaeba9da057855d06eb7fc08d9ca03fd08d7bc7"
-            build_type: cmake
+          # ══════════════════════════════════════════════════════════════════
+          # NEW PACKAGES — autoconf targets (./configure && make && make install)
+          # ══════════════════════════════════════════════════════════════════
 
-          - package: pcre2
-            os: darwin
-            arch: arm64
-            runner: macos-14
-            version: "10.47"
-            source_url: "https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.47/pcre2-10.47.tar.bz2"
-            source_sha256: "47fe8c99461250d42f89e6e8fdaeba9da057855d06eb7fc08d9ca03fd08d7bc7"
-            build_type: cmake
+          # ── ncurses 6.6 ───────────────────────────────────────────────────
+          - {package: ncurses, os: linux,  arch: amd64, runner: ubuntu-22.04,     version: "6.6", build_type: autoconf, configure_flags: "--enable-shared --enable-widec --with-shared --without-debug --without-ada --enable-pc-files", source_url: "https://ftpmirror.gnu.org/gnu/ncurses/ncurses-6.6.tar.gz", source_sha256: "355b4cbbed880b0381a04c46617b7656e362585d52e9cf84a67e2009b749ff11"}
+          - {package: ncurses, os: linux,  arch: arm64, runner: ubuntu-22.04-arm, version: "6.6", build_type: autoconf, configure_flags: "--enable-shared --enable-widec --with-shared --without-debug --without-ada --enable-pc-files", source_url: "https://ftpmirror.gnu.org/gnu/ncurses/ncurses-6.6.tar.gz", source_sha256: "355b4cbbed880b0381a04c46617b7656e362585d52e9cf84a67e2009b749ff11"}
+          - {package: ncurses, os: darwin, arch: arm64, runner: macos-14,          version: "6.6", build_type: autoconf, configure_flags: "--enable-shared --enable-widec --with-shared --without-debug --without-ada", source_url: "https://ftpmirror.gnu.org/gnu/ncurses/ncurses-6.6.tar.gz", source_sha256: "355b4cbbed880b0381a04c46617b7656e362585d52e9cf84a67e2009b749ff11"}
 
-          - package: pcre2
-            os: windows
-            arch: amd64
-            runner: windows-2022
-            version: "10.47"
-            source_url: "https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.47/pcre2-10.47.tar.bz2"
-            source_sha256: "47fe8c99461250d42f89e6e8fdaeba9da057855d06eb7fc08d9ca03fd08d7bc7"
-            build_type: cmake
+          # ── bzip2 1.0.8 ───────────────────────────────────────────────────
+          # bzip2 does not use autoconf — has a plain Makefile
+          - {package: bzip2, os: linux,  arch: amd64, runner: ubuntu-22.04,     version: "1.0.8", build_type: bzip2_make, source_url: "https://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz", source_sha256: "ab5a03176ee106d3f0fa90e381da478ddae405918153cca248e682cd0c4a2269"}
+          - {package: bzip2, os: linux,  arch: arm64, runner: ubuntu-22.04-arm, version: "1.0.8", build_type: bzip2_make, source_url: "https://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz", source_sha256: "ab5a03176ee106d3f0fa90e381da478ddae405918153cca248e682cd0c4a2269"}
+          - {package: bzip2, os: darwin, arch: arm64, runner: macos-14,          version: "1.0.8", build_type: bzip2_make, source_url: "https://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz", source_sha256: "ab5a03176ee106d3f0fa90e381da478ddae405918153cca248e682cd0c4a2269"}
 
-          # ── expat (cmake, all 4 platforms) ────────────────────────────────
-          - package: expat
-            os: linux
-            arch: amd64
-            runner: ubuntu-22.04
-            version: "2.8.2"
-            source_url: "https://github.com/libexpat/libexpat/releases/download/R_2_8_2/expat-2.8.2.tar.xz"
-            source_sha256: "3ad89b8588e6644bd4e49981480d48b21289eebbcd4f0a1a4afb1c29f99b6ab4"
-            build_type: cmake
+          # ── xz / liblzma 5.6.3 ───────────────────────────────────────────
+          - {package: xz, os: linux,   arch: amd64, runner: ubuntu-22.04,     version: "5.6.3", build_type: autoconf, configure_flags: "--enable-shared --enable-static --disable-xzdec", source_url: "https://github.com/tukaani-project/xz/releases/download/v5.6.3/xz-5.6.3.tar.gz", source_sha256: "b1d45295d3a96f2a4a8d4bcd5abc95b649bc31dba62cee6e4aab12aa41ee61e0"}
+          - {package: xz, os: linux,   arch: arm64, runner: ubuntu-22.04-arm, version: "5.6.3", build_type: autoconf, configure_flags: "--enable-shared --enable-static --disable-xzdec", source_url: "https://github.com/tukaani-project/xz/releases/download/v5.6.3/xz-5.6.3.tar.gz", source_sha256: "b1d45295d3a96f2a4a8d4bcd5abc95b649bc31dba62cee6e4aab12aa41ee61e0"}
+          - {package: xz, os: darwin,  arch: arm64, runner: macos-14,          version: "5.6.3", build_type: autoconf, configure_flags: "--enable-shared --enable-static --disable-xzdec", source_url: "https://github.com/tukaani-project/xz/releases/download/v5.6.3/xz-5.6.3.tar.gz", source_sha256: "b1d45295d3a96f2a4a8d4bcd5abc95b649bc31dba62cee6e4aab12aa41ee61e0"}
+          - {package: xz, os: windows, arch: amd64, runner: windows-2022,      version: "5.6.3", build_type: cmake,    configure_flags: "",                                                     source_url: "https://github.com/tukaani-project/xz/releases/download/v5.6.3/xz-5.6.3.tar.gz", source_sha256: "b1d45295d3a96f2a4a8d4bcd5abc95b649bc31dba62cee6e4aab12aa41ee61e0"}
 
-          - package: expat
-            os: linux
-            arch: arm64
-            runner: ubuntu-22.04-arm
-            version: "2.8.2"
-            source_url: "https://github.com/libexpat/libexpat/releases/download/R_2_8_2/expat-2.8.2.tar.xz"
-            source_sha256: "3ad89b8588e6644bd4e49981480d48b21289eebbcd4f0a1a4afb1c29f99b6ab4"
-            build_type: cmake
+          # ── readline 8.3 ──────────────────────────────────────────────────
+          # readline is not meaningful on Windows; macOS ships its own
+          - {package: readline, os: linux, arch: amd64, runner: ubuntu-22.04,     version: "8.3", build_type: autoconf, configure_flags: "--enable-shared --enable-static", source_url: "https://ftpmirror.gnu.org/gnu/readline/readline-8.3.tar.gz", source_sha256: "fe5383204467828cd495ee8d1d3c037a7eba1389c22bc6a041f627976f9061cc"}
+          - {package: readline, os: linux, arch: arm64, runner: ubuntu-22.04-arm, version: "8.3", build_type: autoconf, configure_flags: "--enable-shared --enable-static", source_url: "https://ftpmirror.gnu.org/gnu/readline/readline-8.3.tar.gz", source_sha256: "fe5383204467828cd495ee8d1d3c037a7eba1389c22bc6a041f627976f9061cc"}
+          - {package: readline, os: darwin, arch: arm64, runner: macos-14,         version: "8.3", build_type: autoconf, configure_flags: "--enable-shared --enable-static", source_url: "https://ftpmirror.gnu.org/gnu/readline/readline-8.3.tar.gz", source_sha256: "fe5383204467828cd495ee8d1d3c037a7eba1389c22bc6a041f627976f9061cc"}
 
-          - package: expat
-            os: darwin
-            arch: arm64
-            runner: macos-14
-            version: "2.8.2"
-            source_url: "https://github.com/libexpat/libexpat/releases/download/R_2_8_2/expat-2.8.2.tar.xz"
-            source_sha256: "3ad89b8588e6644bd4e49981480d48b21289eebbcd4f0a1a4afb1c29f99b6ab4"
-            build_type: cmake
+          # ── openssl 3.4.1 ─────────────────────────────────────────────────
+          - {package: openssl, os: linux,  arch: amd64, runner: ubuntu-22.04,     version: "3.4.1", build_type: openssl_build, configure_flags: "linux-x86_64",   source_url: "https://github.com/openssl/openssl/releases/download/openssl-3.4.1/openssl-3.4.1.tar.gz", source_sha256: "002a2d6b30b58bf4bea46c43bdd96365aaf8daa6c428782aa4feee06da197df3"}
+          - {package: openssl, os: linux,  arch: arm64, runner: ubuntu-22.04-arm, version: "3.4.1", build_type: openssl_build, configure_flags: "linux-aarch64",  source_url: "https://github.com/openssl/openssl/releases/download/openssl-3.4.1/openssl-3.4.1.tar.gz", source_sha256: "002a2d6b30b58bf4bea46c43bdd96365aaf8daa6c428782aa4feee06da197df3"}
+          - {package: openssl, os: darwin, arch: arm64, runner: macos-14,          version: "3.4.1", build_type: openssl_build, configure_flags: "darwin64-arm64", source_url: "https://github.com/openssl/openssl/releases/download/openssl-3.4.1/openssl-3.4.1.tar.gz", source_sha256: "002a2d6b30b58bf4bea46c43bdd96365aaf8daa6c428782aa4feee06da197df3"}
 
-          - package: expat
-            os: windows
-            arch: amd64
-            runner: windows-2022
-            version: "2.8.2"
-            source_url: "https://github.com/libexpat/libexpat/releases/download/R_2_8_2/expat-2.8.2.tar.xz"
-            source_sha256: "3ad89b8588e6644bd4e49981480d48b21289eebbcd4f0a1a4afb1c29f99b6ab4"
-            build_type: cmake
+          # ── curl 8.21.0 ───────────────────────────────────────────────────
+          - {package: curl, os: linux,  arch: amd64, runner: ubuntu-22.04,     version: "8.21.0", build_type: autoconf, configure_flags: "--with-openssl --enable-shared --enable-static --with-zlib --without-libpsl", source_url: "https://curl.se/download/curl-8.21.0.tar.gz", source_sha256: "d9b327997999045a24cda50f3983e69e51c516bd8be6ef9842fc7f99135e33bb"}
+          - {package: curl, os: linux,  arch: arm64, runner: ubuntu-22.04-arm, version: "8.21.0", build_type: autoconf, configure_flags: "--with-openssl --enable-shared --enable-static --with-zlib --without-libpsl", source_url: "https://curl.se/download/curl-8.21.0.tar.gz", source_sha256: "d9b327997999045a24cda50f3983e69e51c516bd8be6ef9842fc7f99135e33bb"}
+          - {package: curl, os: darwin, arch: arm64, runner: macos-14,          version: "8.21.0", build_type: autoconf, configure_flags: "--with-openssl --enable-shared --enable-static --with-zlib --without-libpsl", source_url: "https://curl.se/download/curl-8.21.0.tar.gz", source_sha256: "d9b327997999045a24cda50f3983e69e51c516bd8be6ef9842fc7f99135e33bb"}
 
-          # ── c-ares (cmake, all 4 platforms) ───────────────────────────────
-          # NOTE: source_sha256 below could not be independently confirmed
-          # against a citable checksum source during authoring — verify it
-          # against the release's .asc signature or SLSA provenance before
-          # relying on this in production.
-          - package: c-ares
-            os: linux
-            arch: amd64
-            runner: ubuntu-22.04
-            version: "1.34.6"
-            source_url: "https://github.com/c-ares/c-ares/releases/download/v1.34.6/c-ares-1.34.6.tar.gz"
-            source_sha256: "PLEASE_VERIFY_SHA256"
-            build_type: cmake
+          # ── libxml2 2.13.5 ────────────────────────────────────────────────
+          - {package: libxml2, os: linux,  arch: amd64, runner: ubuntu-22.04,     version: "2.13.5", build_type: autoconf, configure_flags: "--enable-shared --enable-static --without-python --with-zlib", source_url: "https://download.gnome.org/sources/libxml2/2.13/libxml2-2.13.5.tar.xz", source_sha256: "74fc163217a3964257d3be39af943e08861258db0724727a4a7470c0f4991fdf"}
+          - {package: libxml2, os: linux,  arch: arm64, runner: ubuntu-22.04-arm, version: "2.13.5", build_type: autoconf, configure_flags: "--enable-shared --enable-static --without-python --with-zlib", source_url: "https://download.gnome.org/sources/libxml2/2.13/libxml2-2.13.5.tar.xz", source_sha256: "74fc163217a3964257d3be39af943e08861258db0724727a4a7470c0f4991fdf"}
+          - {package: libxml2, os: darwin, arch: arm64, runner: macos-14,          version: "2.13.5", build_type: autoconf, configure_flags: "--enable-shared --enable-static --without-python --with-zlib", source_url: "https://download.gnome.org/sources/libxml2/2.13/libxml2-2.13.5.tar.xz", source_sha256: "74fc163217a3964257d3be39af943e08861258db0724727a4a7470c0f4991fdf"}
 
-          - package: c-ares
-            os: linux
-            arch: arm64
-            runner: ubuntu-22.04-arm
-            version: "1.34.6"
-            source_url: "https://github.com/c-ares/c-ares/releases/download/v1.34.6/c-ares-1.34.6.tar.gz"
-            source_sha256: "PLEASE_VERIFY_SHA256"
-            build_type: cmake
+          # ── gettext 0.22.5 ────────────────────────────────────────────────
+          - {package: gettext, os: linux,  arch: amd64, runner: ubuntu-22.04,     version: "0.22.5", build_type: autoconf, configure_flags: "--enable-shared --enable-static --disable-java --disable-csharp --without-emacs", source_url: "https://ftpmirror.gnu.org/gnu/gettext/gettext-0.22.5.tar.gz", source_sha256: "ec1705b1e969b83a9f073144ec806151db88127f5e40fe5a94cb6c8fa48996a0"}
+          - {package: gettext, os: linux,  arch: arm64, runner: ubuntu-22.04-arm, version: "0.22.5", build_type: autoconf, configure_flags: "--enable-shared --enable-static --disable-java --disable-csharp --without-emacs", source_url: "https://ftpmirror.gnu.org/gnu/gettext/gettext-0.22.5.tar.gz", source_sha256: "ec1705b1e969b83a9f073144ec806151db88127f5e40fe5a94cb6c8fa48996a0"}
+          - {package: gettext, os: darwin, arch: arm64, runner: macos-14,          version: "0.22.5", build_type: autoconf, configure_flags: "--enable-shared --enable-static --disable-java --disable-csharp --without-emacs", source_url: "https://ftpmirror.gnu.org/gnu/gettext/gettext-0.22.5.tar.gz", source_sha256: "ec1705b1e969b83a9f073144ec806151db88127f5e40fe5a94cb6c8fa48996a0"}
 
-          - package: c-ares
-            os: darwin
-            arch: arm64
-            runner: macos-14
-            version: "1.34.6"
-            source_url: "https://github.com/c-ares/c-ares/releases/download/v1.34.6/c-ares-1.34.6.tar.gz"
-            source_sha256: "PLEASE_VERIFY_SHA256"
-            build_type: cmake
+          # ══════════════════════════════════════════════════════════════════
+          # NEW PACKAGES — git-sourced builds
+          # ══════════════════════════════════════════════════════════════════
 
-          - package: c-ares
-            os: windows
-            arch: amd64
-            runner: windows-2022
-            version: "1.34.6"
-            source_url: "https://github.com/c-ares/c-ares/releases/download/v1.34.6/c-ares-1.34.6.tar.gz"
-            source_sha256: "PLEASE_VERIFY_SHA256"
-            build_type: cmake
+          # ── LuaJIT 2.1 (rolling release, build from v2.1 branch) ──────────
+          # No versioned tarballs exist; luajit.org explicitly states git-only
+          - {package: luajit, os: linux,  arch: amd64, runner: ubuntu-22.04,     version: "2.1", build_type: luajit_make, git_url: "https://github.com/LuaJIT/LuaJIT.git", git_ref: "v2.1", source_url: "", source_sha256: ""}
+          - {package: luajit, os: linux,  arch: arm64, runner: ubuntu-22.04-arm, version: "2.1", build_type: luajit_make, git_url: "https://github.com/LuaJIT/LuaJIT.git", git_ref: "v2.1", source_url: "", source_sha256: ""}
+          - {package: luajit, os: darwin, arch: arm64, runner: macos-14,          version: "2.1", build_type: luajit_make, git_url: "https://github.com/LuaJIT/LuaJIT.git", git_ref: "v2.1", source_url: "", source_sha256: ""}
 
-          # ── libuv (cmake, all 4 platforms) ────────────────────────────────
-          - package: libuv
-            os: linux
-            arch: amd64
-            runner: ubuntu-22.04
-            version: "1.51.0"
-            source_url: "https://github.com/libuv/libuv/archive/refs/tags/v1.51.0.tar.gz"
-            source_sha256: "27e55cf7083913bfb6826ca78cde9de7647cded648d35f24163f2d31bb9f51cd"
-            build_type: cmake
+          # ── mruby 4.0.0 ───────────────────────────────────────────────────
+          - {package: mruby, os: linux,  arch: amd64, runner: ubuntu-22.04,     version: "4.0.0", build_type: mruby_rake, source_url: "https://github.com/mruby/mruby/archive/refs/tags/4.0.0.tar.gz", source_sha256: ""}
+          - {package: mruby, os: linux,  arch: arm64, runner: ubuntu-22.04-arm, version: "4.0.0", build_type: mruby_rake, source_url: "https://github.com/mruby/mruby/archive/refs/tags/4.0.0.tar.gz", source_sha256: ""}
+          - {package: mruby, os: darwin, arch: arm64, runner: macos-14,          version: "4.0.0", build_type: mruby_rake, source_url: "https://github.com/mruby/mruby/archive/refs/tags/4.0.0.tar.gz", source_sha256: ""}
 
-          - package: libuv
-            os: linux
-            arch: arm64
-            runner: ubuntu-22.04-arm
-            version: "1.51.0"
-            source_url: "https://github.com/libuv/libuv/archive/refs/tags/v1.51.0.tar.gz"
-            source_sha256: "27e55cf7083913bfb6826ca78cde9de7647cded648d35f24163f2d31bb9f51cd"
-            build_type: cmake
-
-          - package: libuv
-            os: darwin
-            arch: arm64
-            runner: macos-14
-            version: "1.51.0"
-            source_url: "https://github.com/libuv/libuv/archive/refs/tags/v1.51.0.tar.gz"
-            source_sha256: "27e55cf7083913bfb6826ca78cde9de7647cded648d35f24163f2d31bb9f51cd"
-            build_type: cmake
-
-          - package: libuv
-            os: windows
-            arch: amd64
-            runner: windows-2022
-            version: "1.51.0"
-            source_url: "https://github.com/libuv/libuv/archive/refs/tags/v1.51.0.tar.gz"
-            source_sha256: "27e55cf7083913bfb6826ca78cde9de7647cded648d35f24163f2d31bb9f51cd"
-            build_type: cmake
-
-          # ── ncurses (autoconf, Linux + macOS only — no official Windows
-          #    autotools build without MSYS) ────────────────────────────────
-          - package: ncurses
-            os: linux
-            arch: amd64
-            runner: ubuntu-22.04
-            version: "6.5"
-            source_url: "https://ftp.gnu.org/gnu/ncurses/ncurses-6.5.tar.gz"
-            source_sha256: "136d91bc269a9a5785e5f9e980bc76ab57428f604ce3e5a5a90cebc767971cc6"
-            build_type: autoconf
-
-          - package: ncurses
-            os: linux
-            arch: arm64
-            runner: ubuntu-22.04-arm
-            version: "6.5"
-            source_url: "https://ftp.gnu.org/gnu/ncurses/ncurses-6.5.tar.gz"
-            source_sha256: "136d91bc269a9a5785e5f9e980bc76ab57428f604ce3e5a5a90cebc767971cc6"
-            build_type: autoconf
-
-          - package: ncurses
-            os: darwin
-            arch: arm64
-            runner: macos-14
-            version: "6.5"
-            source_url: "https://ftp.gnu.org/gnu/ncurses/ncurses-6.5.tar.gz"
-            source_sha256: "136d91bc269a9a5785e5f9e980bc76ab57428f604ce3e5a5a90cebc767971cc6"
-            build_type: autoconf
-
-          # ── xz / liblzma (autoconf, Linux + macOS only) ───────────────────
-          # NOTE: pinned to 5.4.6 deliberately — 5.6.0/5.6.1 contained the
-          # CVE-2024-3094 supply-chain backdoor. Do not bump to 5.6.0/5.6.1.
-          - package: xz
-            os: linux
-            arch: amd64
-            runner: ubuntu-22.04
-            version: "5.4.6"
-            source_url: "https://github.com/tukaani-project/xz/releases/download/v5.4.6/xz-5.4.6.tar.gz"
-            source_sha256: "aeba3e03bf8140ddedf62a0a367158340520f6b384f75ca6045ccc6c0d43fd5c"
-            build_type: autoconf
-
-          - package: xz
-            os: linux
-            arch: arm64
-            runner: ubuntu-22.04-arm
-            version: "5.4.6"
-            source_url: "https://github.com/tukaani-project/xz/releases/download/v5.4.6/xz-5.4.6.tar.gz"
-            source_sha256: "aeba3e03bf8140ddedf62a0a367158340520f6b384f75ca6045ccc6c0d43fd5c"
-            build_type: autoconf
-
-          - package: xz
-            os: darwin
-            arch: arm64
-            runner: macos-14
-            version: "5.4.6"
-            source_url: "https://github.com/tukaani-project/xz/releases/download/v5.4.6/xz-5.4.6.tar.gz"
-            source_sha256: "aeba3e03bf8140ddedf62a0a367158340520f6b384f75ca6045ccc6c0d43fd5c"
-            build_type: autoconf
-
-          # ── libffi (autoconf, Linux + macOS only) ─────────────────────────
-          - package: libffi
-            os: linux
-            arch: amd64
-            runner: ubuntu-22.04
-            version: "3.4.6"
-            source_url: "https://github.com/libffi/libffi/releases/download/v3.4.6/libffi-3.4.6.tar.gz"
-            source_sha256: "b0dea9df23c863a7a50e825440f3ebffabd65df1497108e5d437747843895a4e"
-            build_type: autoconf
-
-          - package: libffi
-            os: linux
-            arch: arm64
-            runner: ubuntu-22.04-arm
-            version: "3.4.6"
-            source_url: "https://github.com/libffi/libffi/releases/download/v3.4.6/libffi-3.4.6.tar.gz"
-            source_sha256: "b0dea9df23c863a7a50e825440f3ebffabd65df1497108e5d437747843895a4e"
-            build_type: autoconf
-
-          - package: libffi
-            os: darwin
-            arch: arm64
-            runner: macos-14
-            version: "3.4.6"
-            source_url: "https://github.com/libffi/libffi/releases/download/v3.4.6/libffi-3.4.6.tar.gz"
-            source_sha256: "b0dea9df23c863a7a50e825440f3ebffabd65df1497108e5d437747843895a4e"
-            build_type: autoconf
-
-          # ── bzip2 (plain Makefile, Linux + macOS only) ────────────────────
-          - package: bzip2
-            os: linux
-            arch: amd64
-            runner: ubuntu-22.04
-            version: "1.0.8"
-            source_url: "https://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz"
-            source_sha256: "ab5a03176ee106d3f0fa90e381da478ddae405918153cca248e682cd0c4a2269"
-            build_type: bzip2_make
-
-          - package: bzip2
-            os: linux
-            arch: arm64
-            runner: ubuntu-22.04-arm
-            version: "1.0.8"
-            source_url: "https://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz"
-            source_sha256: "ab5a03176ee106d3f0fa90e381da478ddae405918153cca248e682cd0c4a2269"
-            build_type: bzip2_make
-
-          - package: bzip2
-            os: darwin
-            arch: arm64
-            runner: macos-14
-            version: "1.0.8"
-            source_url: "https://sourceware.org/pub/bzip2/bzip2-1.0.8.tar.gz"
-            source_sha256: "ab5a03176ee106d3f0fa90e381da478ddae405918153cca248e682cd0c4a2269"
-            build_type: bzip2_make
-
-          # ── LuaJIT (plain Makefile, Linux + macOS only — Windows uses a
-          #    separate msvcbuild.bat toolchain not covered here) ──────────
-          - package: luajit
-            os: linux
-            arch: amd64
-            runner: ubuntu-22.04
-            version: "2.1.0-beta3"
-            source_url: "http://luajit.org/download/LuaJIT-2.1.0-beta3.tar.gz"
-            source_sha256: "1ad2e34b111c802f9d0cdf019e986909123237a28c746b21295b63c9e785d9c3"
-            build_type: luajit_make
-
-          - package: luajit
-            os: linux
-            arch: arm64
-            runner: ubuntu-22.04-arm
-            version: "2.1.0-beta3"
-            source_url: "http://luajit.org/download/LuaJIT-2.1.0-beta3.tar.gz"
-            source_sha256: "1ad2e34b111c802f9d0cdf019e986909123237a28c746b21295b63c9e785d9c3"
-            build_type: luajit_make
-
-          - package: luajit
-            os: darwin
-            arch: arm64
-            runner: macos-14
-            version: "2.1.0-beta3"
-            source_url: "http://luajit.org/download/LuaJIT-2.1.0-beta3.tar.gz"
-            source_sha256: "1ad2e34b111c802f9d0cdf019e986909123237a28c746b21295b63c9e785d9c3"
-            build_type: luajit_make
-
-          # ── mruby (rake-based build, Linux amd64 + macOS arm64 only) ──────
-          - package: mruby
-            os: linux
-            arch: amd64
-            runner: ubuntu-22.04
-            version: "3.3.0"
-            source_url: "https://github.com/mruby/mruby/archive/refs/tags/3.3.0.tar.gz"
-            source_sha256: "53088367e3d7657eb722ddfacb938f74aed1f8538b3717fe0b6eb8f58402af65"
-            build_type: mruby_rake
-
-          - package: mruby
-            os: darwin
-            arch: arm64
-            runner: macos-14
-            version: "3.3.0"
-            source_url: "https://github.com/mruby/mruby/archive/refs/tags/3.3.0.tar.gz"
-            source_sha256: "53088367e3d7657eb722ddfacb938f74aed1f8538b3717fe0b6eb8f58402af65"
-            build_type: mruby_rake
-
-          # ── musl libc (Linux only — it's a libc replacement, not
-          #    applicable to macOS or Windows) ────────────────────────────
-          # NOTE: source_sha256 below could not be independently confirmed
-          # against a citable checksum source during authoring — verify it
-          # against musl-1.2.5.tar.gz.asc before relying on this build.
-          - package: musl
-            os: linux
-            arch: amd64
-            runner: ubuntu-22.04
-            version: "1.2.5"
-            source_url: "https://musl.libc.org/releases/musl-1.2.5.tar.gz"
-            source_sha256: "PLEASE_VERIFY_SHA256"
-            build_type: musl_configure
-
-          - package: musl
-            os: linux
-            arch: arm64
-            runner: ubuntu-22.04-arm
-            version: "1.2.5"
-            source_url: "https://musl.libc.org/releases/musl-1.2.5.tar.gz"
-            source_sha256: "PLEASE_VERIFY_SHA256"
-            build_type: musl_configure
+          # ── musl libc 1.2.5 (Linux only — it IS a Linux libc) ─────────────
+          - {package: musl, os: linux, arch: amd64, runner: ubuntu-22.04,     version: "1.2.5", build_type: autoconf, configure_flags: "--enable-shared --enable-static", source_url: "https://musl.libc.org/releases/musl-1.2.5.tar.gz", source_sha256: "a9a118bbe84d8764da0ea0d28b3ab3fae8477fc7e4085d90102b8596fc7c75e4"}
+          - {package: musl, os: linux, arch: arm64, runner: ubuntu-22.04-arm, version: "1.2.5", build_type: autoconf, configure_flags: "--enable-shared --enable-static", source_url: "https://musl.libc.org/releases/musl-1.2.5.tar.gz", source_sha256: "a9a118bbe84d8764da0ea0d28b3ab3fae8477fc7e4085d90102b8596fc7c75e4"}
 
     steps:
       - uses: actions/checkout@v4
 
-      # ── Platform-specific tool installation ──────────────────────────────
+      # ── Install build dependencies ────────────────────────────────────────
       - name: Install tools (Linux)
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends \
-            build-essential cmake ninja-build pkg-config \
-            zlib1g-dev xz-utils curl zstd bison ruby-dev
+            build-essential cmake ninja-build pkg-config autoconf automake libtool \
+            libssl-dev zlib1g-dev xz-utils curl zstd bzip2 ruby rake \
+            gettext libncurses-dev libreadline-dev
 
       - name: Install tools (macOS)
         if: runner.os == 'macOS'
         run: |
-          brew install cmake ninja zstd xz bison
+          brew install cmake ninja zstd xz autoconf automake libtool pkg-config \
+            openssl@3 ruby
 
       - name: Install tools (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
           choco install -y cmake --installargs 'ADD_CMAKE_TO_PATH=System'
-          choco install -y ninja 7zip
+          choco install -y ninja 7zip perl nasm
 
-      # ── Download source ───────────────────────────────────────────────────
+      # ── Download source (tarball packages) ───────────────────────────────
       - name: Download source archive
+        if: matrix.source_url != ''
         shell: bash
         run: |
           mkdir -p build/src
@@ -675,9 +242,18 @@ jobs:
             -o "build/src/${ARCHIVE_NAME}" "${{ matrix.source_url }}"
           echo "Downloaded ${ARCHIVE_NAME}"
 
-      # ── Verify checksum (cross-platform) ─────────────────────────────────
+      # ── Clone source (git packages) ───────────────────────────────────────
+      - name: Clone source (git)
+        if: matrix.source_url == '' && matrix.git_url != ''
+        shell: bash
+        run: |
+          git clone --depth 1 --branch "${{ matrix.git_ref }}" \
+            "${{ matrix.git_url }}" build/source
+          echo "Cloned ${{ matrix.git_url }} @ ${{ matrix.git_ref }}"
+
+      # ── Verify checksum (Linux) ───────────────────────────────────────────
       - name: Verify source checksum (Linux)
-        if: runner.os == 'Linux'
+        if: runner.os == 'Linux' && matrix.source_sha256 != '' && matrix.source_url != ''
         shell: bash
         run: |
           ARCHIVE_NAME=$(basename "${{ matrix.source_url }}")
@@ -685,7 +261,7 @@ jobs:
           echo "✓ Checksum verified"
 
       - name: Verify source checksum (macOS)
-        if: runner.os == 'macOS'
+        if: runner.os == 'macOS' && matrix.source_sha256 != '' && matrix.source_url != ''
         shell: bash
         run: |
           ARCHIVE_NAME=$(basename "${{ matrix.source_url }}")
@@ -693,12 +269,12 @@ jobs:
           echo "✓ Checksum verified"
 
       - name: Verify source checksum (Windows)
-        if: runner.os == 'Windows'
+        if: runner.os == 'Windows' && matrix.source_url != ''
         shell: pwsh
         run: |
           $expected = "${{ matrix.source_sha256 }}"
           if ($expected -eq "") {
-            Write-Host "No SHA-256 provided for this package (SQLite uses SHA3-256); skipping checksum step."
+            Write-Host "No SHA-256 for this package; skipping checksum verification."
           } else {
             $archive = "build/src/$((Split-Path '${{ matrix.source_url }}' -Leaf))"
             $actual = (Get-FileHash $archive -Algorithm SHA256).Hash.ToLower()
@@ -709,9 +285,9 @@ jobs:
             Write-Host "✓ Checksum verified"
           }
 
-      # ── Extract source ────────────────────────────────────────────────────
+      # ── Extract source (tarball, Unix) ────────────────────────────────────
       - name: Extract source (Unix)
-        if: runner.os != 'Windows'
+        if: runner.os != 'Windows' && matrix.source_url != ''
         shell: bash
         run: |
           ARCHIVE_NAME=$(basename "${{ matrix.source_url }}")
@@ -723,7 +299,6 @@ jobs:
             *.zip)
               TMP=$(mktemp -d)
               unzip -q "build/src/${ARCHIVE_NAME}" -d "${TMP}"
-              # Move contents of the single top-level directory.
               INNER=$(find "${TMP}" -mindepth 1 -maxdepth 1 -type d | head -1)
               mv "${INNER}"/* build/source/
               ;;
@@ -731,109 +306,98 @@ jobs:
           echo "Source extracted."
 
       - name: Extract source (Windows)
-        if: runner.os == 'Windows'
+        if: runner.os == 'Windows' && matrix.source_url != ''
         shell: pwsh
         run: |
           $archive = "build/src/$((Split-Path '${{ matrix.source_url }}' -Leaf))"
           New-Item -ItemType Directory -Force build\source | Out-Null
-          $ext = $archive -replace '.*(\.[^.]+)$','$1'
           if ($archive -match '\.zip$') {
             $tmp = New-TemporaryFile | ForEach-Object { Remove-Item $_; New-Item -Type Directory $_ }
             Expand-Archive -Path $archive -DestinationPath $tmp
             $inner = Get-ChildItem $tmp | Select-Object -First 1
             Get-ChildItem $inner.FullName | ForEach-Object { Move-Item $_.FullName build\source\ }
-          } elseif ($archive -match '\.tar\.(gz|xz|bz2)$') {
+          } else {
             tar -xf $archive -C build\source --strip-components=1
           }
           Write-Host "Source extracted."
 
-      # ── Build: autoconf (SQLite Linux/macOS, ncurses, xz, libffi) ────────
+      # ══════════════════════════════════════════════════════════════════════
+      # BUILD STEPS — one conditional per build_type
+      # ══════════════════════════════════════════════════════════════════════
+
+      # ── autoconf (generic) ────────────────────────────────────────────────
       - name: Build (autoconf)
-        if: matrix.build_type == 'autoconf'
+        if: matrix.build_type == 'autoconf' && runner.os != 'Windows'
         shell: bash
         run: |
           INSTALL_DIR="${PWD}/build/install"
-          mkdir -p build/build_dir
-          cd build/build_dir
+          mkdir -p build/build_dir && cd build/build_dir
           ../source/configure \
             --prefix="${INSTALL_DIR}" \
-            --enable-shared \
-            --enable-static \
-            --enable-threadsafe \
-            --disable-werror 2>&1 | tail -5
+            ${{ matrix.configure_flags }} 2>&1 | tail -10
           make -j$(nproc 2>/dev/null || sysctl -n hw.ncpu)
           make install
 
-      # ── Build: cmake (zlib, zstd, libpng, libjpeg-turbo, pcre2, expat,
-      #    c-ares, libuv, all platforms) ────────────────────────────────────
-      - name: Build (cmake) Unix
+      # ── cmake (generic, Unix) ─────────────────────────────────────────────
+      - name: Build (cmake, Unix)
         if: matrix.build_type == 'cmake' && runner.os != 'Windows'
         shell: bash
         run: |
           INSTALL_DIR="${PWD}/build/install"
-          SRC_DIR="build/source"
-          if [ -n "${{ matrix.cmake_source_subdir }}" ]; then
-            SRC_DIR="build/source/${{ matrix.cmake_source_subdir }}"
-          fi
-          cmake -S "${SRC_DIR}" -B build/build_dir \
+          SRC="build/source"
+          # Some packages (zstd) need cmake to point at a subdirectory
+          [ -n "${{ matrix.cmake_source_subdir }}" ] && SRC="${SRC}/${{ matrix.cmake_source_subdir }}" || true
+          cmake -S "${SRC}" -B build/build_dir \
             -DCMAKE_INSTALL_PREFIX="${INSTALL_DIR}" \
-            -DBUILD_SHARED_LIBS=ON \
             -DCMAKE_BUILD_TYPE=Release \
-            -G Ninja
+            -G Ninja \
+            ${{ matrix.configure_flags }}
           cmake --build build/build_dir --parallel
           cmake --install build/build_dir
 
-      - name: Build (cmake) Windows
+      # ── cmake (generic, Windows) ──────────────────────────────────────────
+      - name: Build (cmake, Windows)
         if: matrix.build_type == 'cmake' && runner.os == 'Windows'
         shell: pwsh
         run: |
-          $INSTALL_DIR = "$PWD\build\install"
-          $SRC_DIR = "build\source"
-          if ("${{ matrix.cmake_source_subdir }}" -ne "") {
-            $SRC_DIR = "build\source\${{ matrix.cmake_source_subdir }}"
-          }
-          cmake -S $SRC_DIR -B build\build_dir `
-            -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" `
-            -DBUILD_SHARED_LIBS=ON `
-            -DCMAKE_BUILD_TYPE=Release
+          $INSTALL = "$PWD\build\install"
+          $SRC = "build\source"
+          if ("${{ matrix.cmake_source_subdir }}" -ne "") { $SRC = "$SRC\${{ matrix.cmake_source_subdir }}" }
+          cmake -S $SRC -B build\build_dir `
+            -DCMAKE_INSTALL_PREFIX="$INSTALL" `
+            -DCMAKE_BUILD_TYPE=Release `
+            ${{ matrix.configure_flags }}
           cmake --build build\build_dir --config Release --parallel
           cmake --install build\build_dir --config Release
 
-      # ── Build: cmake amalgamation (SQLite Windows) ───────────────────────
-      - name: Build SQLite (cmake amalgamation, Windows)
+      # ── cmake_amalgamation (SQLite Windows) ───────────────────────────────
+      - name: Build SQLite amalgamation (Windows)
         if: matrix.build_type == 'cmake_amalgamation'
         shell: pwsh
         run: |
-          # The amalgamation zip contains sqlite3.c, sqlite3.h, sqlite3ext.h, shell.c
           $SRC = "$PWD\build\source"
           $BUILD = "$PWD\build\build_dir"
           $INSTALL = "$PWD\build\install"
           New-Item -ItemType Directory -Force $BUILD, "$INSTALL\bin", "$INSTALL\lib", "$INSTALL\include" | Out-Null
-
-          # Write a minimal CMakeLists.txt to build the amalgamation
           @"
           cmake_minimum_required(VERSION 3.16)
           project(sqlite3 C)
           add_library(sqlite3 SHARED sqlite3.c)
-          target_compile_definitions(sqlite3 PRIVATE
-            SQLITE_ENABLE_MATH_FUNCTIONS SQLITE_ENABLE_FTS5
-            SQLITE_ENABLE_RTREE SQLITE_THREADSAFE=1 SQLITE_DQS=0)
+          target_compile_definitions(sqlite3 PRIVATE SQLITE_ENABLE_MATH_FUNCTIONS
+            SQLITE_ENABLE_FTS5 SQLITE_ENABLE_RTREE SQLITE_THREADSAFE=1 SQLITE_DQS=0)
           set_target_properties(sqlite3 PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
           add_executable(sqlite3_shell shell.c)
           target_link_libraries(sqlite3_shell sqlite3)
           set_target_properties(sqlite3_shell PROPERTIES OUTPUT_NAME sqlite3)
-          install(TARGETS sqlite3 sqlite3_shell
-            RUNTIME DESTINATION bin
-            LIBRARY DESTINATION lib
-            ARCHIVE DESTINATION lib)
+          install(TARGETS sqlite3 sqlite3_shell RUNTIME DESTINATION bin
+            LIBRARY DESTINATION lib ARCHIVE DESTINATION lib)
           install(FILES sqlite3.h sqlite3ext.h DESTINATION include)
           "@ | Set-Content "$SRC\CMakeLists.txt"
-
           cmake -S $SRC -B $BUILD -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$INSTALL
           cmake --build $BUILD --config Release --parallel
           cmake --install $BUILD --config Release
 
-      # ── Build: Lua (Linux/macOS) ──────────────────────────────────────────
+      # ── Lua make ──────────────────────────────────────────────────────────
       - name: Build Lua (make)
         if: matrix.build_type == 'lua_make'
         shell: bash
@@ -841,94 +405,16 @@ jobs:
           INSTALL_DIR="${PWD}/build/install"
           mkdir -p "${INSTALL_DIR}"
           cd build/source
-
-          # Determine Lua make platform target
           case "${{ matrix.os }}" in
             linux)  PLAT=linux ;;
             darwin) PLAT=macosx ;;
             *)      PLAT=posix ;;
           esac
-
           NPROC=$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4)
-
-          # Build first, then install — Lua's Makefile requires this order.
           make -j${NPROC} MYCFLAGS="-fPIC" ${PLAT}
           make install INSTALL_TOP="${INSTALL_DIR}"
 
-      # ── Build: bzip2 (plain Makefile, Linux/macOS) ────────────────────────
-      - name: Build bzip2 (make)
-        if: matrix.build_type == 'bzip2_make'
-        shell: bash
-        run: |
-          INSTALL_DIR="${PWD}/build/install"
-          mkdir -p "${INSTALL_DIR}"
-          cd build/source
-
-          NPROC=$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4)
-
-          # bzip2's Makefile predates -fPIC defaults; build the shared lib
-          # target explicitly in addition to the static lib + CLI.
-          sed -i.bak 's/^CFLAGS=\(.*\)$/CFLAGS=\1 -fPIC/' Makefile Makefile-libbz2_so || true
-          make -j${NPROC}
-          make -f Makefile-libbz2_so -j${NPROC} || true
-          make install PREFIX="${INSTALL_DIR}"
-          cp -f libbz2.so* "${INSTALL_DIR}/lib/" 2>/dev/null || true
-
-      # ── Build: LuaJIT (plain Makefile, Linux/macOS) ───────────────────────
-      - name: Build LuaJIT (make)
-        if: matrix.build_type == 'luajit_make'
-        shell: bash
-        run: |
-          INSTALL_DIR="${PWD}/build/install"
-          mkdir -p "${INSTALL_DIR}"
-          cd build/source
-
-          NPROC=$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4)
-
-          make -j${NPROC} PREFIX="${INSTALL_DIR}"
-          make install PREFIX="${INSTALL_DIR}"
-          echo "LuaJIT version: $("${INSTALL_DIR}/bin/luajit" -v)"
-
-      # ── Build: mruby (rake, Linux amd64 + macOS arm64) ────────────────────
-      - name: Build mruby (rake)
-        if: matrix.build_type == 'mruby_rake'
-        shell: bash
-        run: |
-          INSTALL_DIR="${PWD}/build/install"
-          mkdir -p "${INSTALL_DIR}"
-          cd build/source
-
-          cp build_config/default.rb homebrew.rb
-          sed -i.bak "s/conf.gembox 'default'/conf.gembox 'full-core'/" homebrew.rb || \
-            sed -i '' "s/conf.gembox 'default'/conf.gembox 'full-core'/" homebrew.rb
-
-          MRUBY_CONFIG="${PWD}/homebrew.rb" rake
-
-          mkdir -p "${INSTALL_DIR}/lib" "${INSTALL_DIR}/bin" "${INSTALL_DIR}/include"
-          cp -f build/host/lib/*.a "${INSTALL_DIR}/lib/"
-          cp -rf build/host/bin/* "${INSTALL_DIR}/bin/"
-          cp -rf include/* "${INSTALL_DIR}/include/"
-          echo "mruby build complete."
-
-      # ── Build: musl libc (configure + make, Linux only) ───────────────────
-      - name: Build musl (configure)
-        if: matrix.build_type == 'musl_configure'
-        shell: bash
-        run: |
-          INSTALL_DIR="${PWD}/build/install"
-          mkdir -p "${INSTALL_DIR}"
-          cd build/source
-
-          NPROC=$(nproc 2>/dev/null || echo 4)
-
-          ./configure \
-            --prefix="${INSTALL_DIR}" \
-            --syslibdir="${INSTALL_DIR}/lib"
-          make -j${NPROC}
-          make install
-          echo "musl built for ${{ matrix.arch }}."
-
-      # ── Build: Zig (prebuilt repackage) ──────────────────────────────────
+      # ── Zig prebuilt ──────────────────────────────────────────────────────
       - name: Repackage Zig (Unix)
         if: matrix.build_type == 'zig_prebuilt' && runner.os != 'Windows'
         shell: bash
@@ -937,10 +423,9 @@ jobs:
           mkdir -p "${INSTALL_DIR}/bin"
           cp build/source/zig "${INSTALL_DIR}/bin/zig"
           chmod +x "${INSTALL_DIR}/bin/zig"
-          # Include stdlib
           cp -r build/source/lib "${INSTALL_DIR}/" 2>/dev/null || true
           cp -r build/source/doc "${INSTALL_DIR}/" 2>/dev/null || true
-          echo "Zig version: $("${INSTALL_DIR}/bin/zig" version)"
+          echo "Zig: $("${INSTALL_DIR}/bin/zig" version)"
 
       - name: Repackage Zig (Windows)
         if: matrix.build_type == 'zig_prebuilt' && runner.os == 'Windows'
@@ -949,12 +434,76 @@ jobs:
           $INSTALL = "$PWD\build\install"
           New-Item -ItemType Directory -Force "$INSTALL\bin" | Out-Null
           Copy-Item build\source\zig.exe "$INSTALL\bin\zig.exe"
-          if (Test-Path build\source\lib)  { Copy-Item -Recurse build\source\lib  "$INSTALL\lib" }
-          if (Test-Path build\source\doc)  { Copy-Item -Recurse build\source\doc  "$INSTALL\doc" }
-          $ver = & "$INSTALL\bin\zig.exe" version
-          Write-Host "Zig version: $ver"
+          if (Test-Path build\source\lib) { Copy-Item -Recurse build\source\lib  "$INSTALL\lib" }
+          if (Test-Path build\source\doc) { Copy-Item -Recurse build\source\doc  "$INSTALL\doc" }
+          Write-Host "Zig: $(& "$INSTALL\bin\zig.exe" version)"
 
-      # ── Package artifact (Unix: tar.zst) ─────────────────────────────────
+      # ── bzip2 (plain Makefile) ────────────────────────────────────────────
+      - name: Build bzip2 (make)
+        if: matrix.build_type == 'bzip2_make'
+        shell: bash
+        run: |
+          INSTALL_DIR="${PWD}/build/install"
+          mkdir -p "${INSTALL_DIR}"
+          cd build/source
+          NPROC=$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4)
+          # Build shared library variant first
+          make -f Makefile-libbz2_so -j${NPROC}
+          # Build static library and tools
+          make -j${NPROC}
+          make install PREFIX="${INSTALL_DIR}"
+          # Copy shared library
+          cp libbz2.so.1.0.8 libbz2.so.1.0 "${INSTALL_DIR}/lib/" 2>/dev/null || true
+          cp libbz2.so.1.0 "${INSTALL_DIR}/lib/libbz2.so" 2>/dev/null || true
+
+      # ── OpenSSL (custom Configure script) ────────────────────────────────
+      - name: Build OpenSSL
+        if: matrix.build_type == 'openssl_build'
+        shell: bash
+        run: |
+          INSTALL_DIR="${PWD}/build/install"
+          cd build/source
+          NPROC=$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4)
+          perl Configure \
+            ${{ matrix.configure_flags }} \
+            --prefix="${INSTALL_DIR}" \
+            --openssldir="${INSTALL_DIR}/ssl" \
+            shared \
+            no-tests
+          make -j${NPROC}
+          make install_sw   # skip man pages to save time
+
+      # ── LuaJIT (make) ─────────────────────────────────────────────────────
+      - name: Build LuaJIT
+        if: matrix.build_type == 'luajit_make'
+        shell: bash
+        run: |
+          INSTALL_DIR="${PWD}/build/install"
+          NPROC=$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4)
+          cd build/source
+          make -j${NPROC} PREFIX="${INSTALL_DIR}"
+          make install PREFIX="${INSTALL_DIR}"
+
+      # ── mruby (rake) ──────────────────────────────────────────────────────
+      - name: Build mruby
+        if: matrix.build_type == 'mruby_rake'
+        shell: bash
+        run: |
+          INSTALL_DIR="${PWD}/build/install"
+          mkdir -p "${INSTALL_DIR}"
+          cd build/source
+          rake MRUBY_CONFIG="" 2>&1 | tail -20
+          # mruby installs into build/host by default; copy to our prefix
+          mkdir -p "${INSTALL_DIR}/bin" "${INSTALL_DIR}/lib"
+          cp build/host/bin/mruby build/host/bin/mrbc build/host/bin/mirb \
+             "${INSTALL_DIR}/bin/" 2>/dev/null || true
+          cp -r build/host/lib/* "${INSTALL_DIR}/lib/" 2>/dev/null || true
+          cp -r include "${INSTALL_DIR}/" 2>/dev/null || true
+
+      # ══════════════════════════════════════════════════════════════════════
+      # PACKAGE + UPLOAD
+      # ══════════════════════════════════════════════════════════════════════
+
       - name: Package artifact (Unix)
         if: runner.os != 'Windows'
         shell: bash
@@ -962,22 +511,13 @@ jobs:
           INSTALL_DIR="${PWD}/build/install"
           ARTIFACT_DIR="${PWD}/artifacts"
           mkdir -p "${ARTIFACT_DIR}"
-
-          # Verify something was actually installed
           if [ -z "$(ls -A ${INSTALL_DIR} 2>/dev/null)" ]; then
-            echo "ERROR: install directory is empty!"
-            exit 1
+            echo "ERROR: install directory is empty!" && exit 1
           fi
-
           ARTIFACT_NAME="${{ matrix.package }}-${{ matrix.os }}-${{ matrix.arch }}"
           ARTIFACT_FILE="${ARTIFACT_NAME}.tar.zst"
-
-          tar -C "${INSTALL_DIR}" \
-              -c . \
-              | zstd -T0 -19 -o "${ARTIFACT_DIR}/${ARTIFACT_FILE}"
-
+          tar -C "${INSTALL_DIR}" -c . | zstd -T0 -19 -o "${ARTIFACT_DIR}/${ARTIFACT_FILE}"
           cd "${ARTIFACT_DIR}"
-          # macOS uses shasum; Linux uses sha256sum
           if command -v sha256sum &>/dev/null; then
             sha256sum "${ARTIFACT_FILE}" > "${ARTIFACT_FILE}.sha256"
           else
@@ -985,7 +525,6 @@ jobs:
           fi
           echo "Packaged: ${ARTIFACT_FILE} ($(du -sh ${ARTIFACT_FILE} | cut -f1))"
 
-      # ── Package artifact (Windows: zip) ──────────────────────────────────
       - name: Package artifact (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
@@ -993,23 +532,16 @@ jobs:
           $INSTALL = "$PWD\build\install"
           $ARTIFACTS = "$PWD\artifacts"
           New-Item -ItemType Directory -Force $ARTIFACTS | Out-Null
-
           if (-not (Get-ChildItem $INSTALL -ErrorAction SilentlyContinue)) {
-            Write-Error "Install directory is empty!"
-            exit 1
+            Write-Error "Install directory is empty!" && exit 1
           }
-
           $ARTIFACT_NAME = "${{ matrix.package }}-${{ matrix.os }}-${{ matrix.arch }}"
           $ARTIFACT_FILE = "${ARTIFACT_NAME}.zip"
-
-          # Use 7zip for reliable Windows zip creation
           & "C:\Program Files\7-Zip\7z.exe" a -tzip "$ARTIFACTS\$ARTIFACT_FILE" "$INSTALL\*"
-
           $hash = (Get-FileHash "$ARTIFACTS\$ARTIFACT_FILE" -Algorithm SHA256).Hash.ToLower()
           "$hash  $ARTIFACT_FILE" | Set-Content "$ARTIFACTS\$ARTIFACT_FILE.sha256"
           Write-Host "Packaged: $ARTIFACT_FILE"
 
-      # ── Upload ────────────────────────────────────────────────────────────
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
@@ -1067,9 +599,18 @@ jobs:
               segs = base.split("-")
               if len(segs) < 3:
                   continue
-              pkg_name = segs[0]
-              pkg_os   = segs[1]
-              pkg_arch = "-".join(segs[2:])
+              # Handle packages with hyphens in the name (e.g. libjpeg-turbo, c-ares)
+              # Convention: name-os-arch where os is linux/darwin/windows
+              os_idx = None
+              for i, s in enumerate(segs):
+                  if s in ("linux", "darwin", "windows"):
+                      os_idx = i
+                      break
+              if os_idx is None or os_idx == 0:
+                  continue
+              pkg_name = "-".join(segs[:os_idx])
+              pkg_os   = segs[os_idx]
+              pkg_arch = "-".join(segs[os_idx+1:])
 
               archive_path = os.path.join(os.path.dirname(sha_file), archive_name)
               size = os.path.getsize(archive_path) if os.path.exists(archive_path) else 0
@@ -1124,12 +665,16 @@ jobs:
 
             Pre-built packages from official upstream sources, verified by SHA-256.
 
+            ### Packages in this release
+            zstd · libpng · libjpeg-turbo · pcre2 · ncurses · bzip2 · xz/liblzma ·
+            expat · libffi · c-ares · libuv · curl · libxml2 · gettext · readline ·
+            openssl · luajit · mruby · musl · sqlite · zlib · lua · zig
+
             ### Install
             ```bash
             kompa install sqlite
-            kompa install zlib
-            kompa install lua
-            kompa install zig
+            kompa install openssl curl libxml2
+            kompa install zstd libpng libjpeg-turbo
             ```
 
             The `manifest.json` attached to this release lists all packages with their checksums and download URLs.
