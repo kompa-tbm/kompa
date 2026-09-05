@@ -9,7 +9,7 @@
   "source_url": "https://github.com/mruby/mruby/archive/refs/tags/3.3.0.tar.gz",
   "source_tag": "3.3.0",
   "source_sha256": "53088367e3d7657eb722ddfacb938f74aed1f8538b3717fe0b6eb8f58402af65",
-  "build_system": "rake",
+  "build_system": "make",
   "make_targets": ["all"],
   "artifact_format": "tar.zst",
   "dependencies": [],
